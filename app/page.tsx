@@ -313,12 +313,12 @@ function HeroHUD() {
 
   const bars = [0.4, 0.7, 0.9, 0.6, 0.8];
   return (
-    <div style={{ position: "absolute", top: 80, right: 40, fontFamily: "var(--mono)", fontSize: 11, background: "rgba(5,5,8,.7)", backdropFilter: "blur(12px)", border: "1px solid var(--border)", borderRadius: 6, padding: "14px 18px", minWidth: 200, zIndex: 10 }}>
-      <div style={{ color: "var(--cyan)", fontSize: 10, letterSpacing: 3, marginBottom: 10 }}>LIVE THREAT SCAN</div>
+    <div style={{ position: "absolute", top: 80, right: 40, fontFamily: "var(--mono)", fontSize: 11, background: "rgba(10,14,26,.7)", backdropFilter: "blur(16px)", border: "1px solid var(--border-blue)", borderRadius: 6, padding: "14px 18px", minWidth: 200, zIndex: 10 }}>
+      <div style={{ color: "var(--secondary)", fontSize: 10, letterSpacing: 3, marginBottom: 10 }}>LIVE THREAT SCAN</div>
       {[["Nodes indexed", vals.nodes, "nodes"], ["Attack paths", vals.paths, "paths"], ["Crown jewels", vals.jewels, "jewels"]].map(([label, val, key]) => (
         <div key={key as string} style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 4 }}>
           <span style={{ color: "var(--muted)" }}>{label as string}</span>
-          <span style={{ color: (flash.includes(key as string)) ? "var(--cyan)" : "var(--text)", transition: "color .2s" }}>{val as number}</span>
+          <span style={{ color: (flash.includes(key as string)) ? "var(--secondary)" : "var(--text)", transition: "color .2s" }}>{val as number}</span>
         </div>
       ))}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
@@ -326,7 +326,7 @@ function HeroHUD() {
         <span style={{ color: "var(--green)" }}>MONITORING <span style={{ color: "var(--red)", animation: "blink 1s infinite" }}>●</span></span>
       </div>
       <div style={{ display: "flex", gap: 3, marginTop: 10, alignItems: "flex-end", height: 20 }}>
-        {bars.map((h, i) => <div key={i} style={{ width: 3, height: h * 20, background: "var(--cyan)", opacity: .6, animation: `blink ${0.8 + i * 0.2}s infinite`, animationDelay: `${i * 0.15}s` }} />)}
+        {bars.map((h, i) => <div key={i} style={{ width: 3, height: h * 20, background: "var(--secondary)", opacity: .6, animation: `blink ${0.8 + i * 0.2}s infinite`, animationDelay: `${i * 0.15}s` }} />)}
       </div>
     </div>
   );
@@ -335,15 +335,15 @@ function HeroHUD() {
 /* ─── NAVLINK ─── */
 function NavBar() {
   return (
-    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--border)", background: "rgba(5,5,8,.85)", backdropFilter: "blur(16px)" }}>
+    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--border)", background: "rgba(10,14,26,.85)", backdropFilter: "blur(16px)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 28, height: 28, background: "var(--cyan)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⬡</div>
+        <div style={{ width: 28, height: 28, background: "var(--primary)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff" }}>⬡</div>
         <span style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: 15, color: "var(--text)" }}>KUBEVIEW</span>
-        <span style={{ fontFamily: "var(--mono)", fontSize: 9, padding: "2px 6px", border: "1px solid var(--cyan)", borderRadius: 20, color: "var(--cyan)" }}>BETA</span>
+        <span style={{ fontFamily: "var(--mono)", fontSize: 9, padding: "2px 6px", border: "1px solid var(--primary)", borderRadius: 20, color: "var(--primary)" }}>BETA</span>
       </div>
       <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
         <Link href="/login" className="fl">Sign in</Link>
-        <Link href="/signup" style={{ background: "var(--cyan)", color: "#000", fontWeight: 700, padding: "8px 18px", borderRadius: 6, textDecoration: "none", fontSize: 13, fontFamily: "var(--sans)" }}>Get started</Link>
+        <Link href="/signup" style={{ background: "linear-gradient(135deg, #F97316, #C2570A)", color: "#fff", fontWeight: 700, padding: "8px 18px", borderRadius: 6, textDecoration: "none", fontSize: 13, fontFamily: "var(--sans)" }}>Get started</Link>
       </div>
     </nav>
   );
@@ -355,13 +355,13 @@ function HeroSection({ ready }: { ready: boolean }) {
   useEffect(() => { if (ready) setTimeout(() => setWordsIn(true), 300); }, [ready]);
   const words = ["Kubernetes", "Security."];
   return (
-    <section style={{ position: "relative", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+    <section style={{ position: "relative", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", background: "radial-gradient(ellipse at 50% 50%, rgba(249,115,22,0.03) 0%, transparent 70%)" }}>
       <HeroCanvas ready={ready} />
       {ready && <HeroHUD />}
-      <div style={{ position: "absolute", left: 40, top: "50%", transform: "translateY(-50%)", writingMode: "vertical-rl", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "var(--muted)", animation: "pulseOp 2s infinite", zIndex: 10 }}>SCROLL TO EXPLORE ↓</div>
+      <div style={{ position: "absolute", left: 40, top: "50%", transform: "translateY(-50%)", writingMode: "vertical-rl", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "rgba(249,115,22,.6)", animation: "pulseOp 2s infinite", zIndex: 10 }}>SCROLL TO EXPLORE ↓</div>
       <div style={{ position: "relative", zIndex: 10, textAlign: "center", maxWidth: 800, padding: "0 20px" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", border: "1px solid var(--cyan)", borderRadius: 99, background: "rgba(0,245,255,.08)", fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 2, color: "var(--muted)", marginBottom: 32 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cyan)", animation: "blink 1s infinite", display: "inline-block" }} />
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", border: "1px solid rgba(249,115,22,.4)", borderRadius: 99, background: "var(--primary-dim)", fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 2, color: "var(--muted)", marginBottom: 32 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--primary)", animation: "blink 1s infinite", display: "inline-block" }} />
           NOW IN PUBLIC BETA
         </div>
         <h1 style={{ fontSize: "clamp(52px,8vw,96px)", fontWeight: 800, lineHeight: 1.0, letterSpacing: "-2px", marginBottom: 8, overflow: "hidden" }}>
@@ -369,20 +369,20 @@ function HeroSection({ ready }: { ready: boolean }) {
             <span key={w} style={{ display: "inline-block", marginRight: i === 0 ? "0.25em" : 0, transform: wordsIn ? "translateY(0)" : "translateY(100%)", opacity: wordsIn ? 1 : 0, transition: `transform 700ms cubic-bezier(.16,1,.3,1) ${i * 150}ms, opacity 700ms ${i * 150}ms` }}>{w}{" "}</span>
           ))}
           <br />
-          <span style={{ color: "var(--cyan)", display: "inline-block", transform: wordsIn ? "translateY(0)" : "translateY(100%)", opacity: wordsIn ? 1 : 0, transition: "transform 700ms cubic-bezier(.16,1,.3,1) 300ms, opacity 700ms 300ms" }}>Visualized.</span>
+          <span style={{ background: "linear-gradient(135deg, #F97316, #FB923C)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block", transform: wordsIn ? "translateY(0)" : "translateY(100%)", opacity: wordsIn ? 1 : 0, transition: "transform 700ms cubic-bezier(.16,1,.3,1) 300ms, opacity 700ms 300ms" }}>Visualized.</span>
         </h1>
         <p style={{ fontSize: 20, color: "var(--muted)", maxWidth: 560, margin: "24px auto 40px", lineHeight: 1.6, opacity: wordsIn ? 1 : 0, transform: wordsIn ? "none" : "translateY(20px)", transition: "all 600ms 400ms" }}>
           Understand how attackers move through your cluster — <em style={{ fontStyle: "normal", color: "var(--text)" }}>not just where vulnerabilities exist</em>.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", opacity: wordsIn ? 1 : 0, transition: "opacity 600ms 550ms" }}>
-          <Link href="/signup" style={{ background: "var(--cyan)", color: "#000", fontWeight: 700, padding: "14px 28px", borderRadius: 6, textDecoration: "none", fontSize: 15, transition: "transform .2s,box-shadow .2s", display: "inline-block" }}
-            onMouseEnter={e => { (e.target as HTMLElement).style.transform = "scale(1.05)"; (e.target as HTMLElement).style.boxShadow = "0 0 40px rgba(0,245,255,.6)"; }}
+          <Link href="/signup" style={{ background: "linear-gradient(135deg, #F97316, #C2570A)", color: "#fff", fontWeight: 700, padding: "14px 28px", borderRadius: 6, textDecoration: "none", fontSize: 15, transition: "transform .2s,box-shadow .2s", display: "inline-block" }}
+            onMouseEnter={e => { (e.target as HTMLElement).style.transform = "scale(1.03)"; (e.target as HTMLElement).style.boxShadow = "var(--glow)"; }}
             onMouseLeave={e => { (e.target as HTMLElement).style.transform = ""; (e.target as HTMLElement).style.boxShadow = ""; }}>
             Start Scan →
           </Link>
-          <Link href="/dashboard" style={{ border: "1px solid var(--cyan)", color: "var(--cyan)", padding: "14px 28px", borderRadius: 6, textDecoration: "none", fontSize: 15, background: "transparent", transition: "background .3s,color .3s", display: "inline-block" }}
-            onMouseEnter={e => { (e.target as HTMLElement).style.background = "var(--cyan)"; (e.target as HTMLElement).style.color = "#000"; }}
-            onMouseLeave={e => { (e.target as HTMLElement).style.background = "transparent"; (e.target as HTMLElement).style.color = "var(--cyan)"; }}>
+          <Link href="/dashboard" style={{ border: "1px solid rgba(249,115,22,.4)", color: "var(--primary)", padding: "14px 28px", borderRadius: 6, textDecoration: "none", fontSize: 15, background: "transparent", transition: "background .3s,color .3s", display: "inline-block" }}
+            onMouseEnter={e => { (e.target as HTMLElement).style.background = "var(--primary)"; (e.target as HTMLElement).style.color = "#fff"; }}
+            onMouseLeave={e => { (e.target as HTMLElement).style.background = "transparent"; (e.target as HTMLElement).style.color = "var(--primary)"; }}>
             View Demo
           </Link>
         </div>
