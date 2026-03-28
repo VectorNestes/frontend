@@ -1,59 +1,97 @@
-import axios from "axios";
+import type {
+  GraphData,
+  Vulnerability,
+  AttackPath,
+  CriticalNode,
+  SimulationResult,
+} from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const BASE =
+  typeof window !== "undefined"
+    ? (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001")
+    : "http://localhost:3001";
 
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 30000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const TIMEOUT_MS = 5000;
 
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+async function fetchJSON<T>(path: string): Promise<T> {
+  const url = `${BASE}${path}`;
+  console.log("[api] GET", url);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+    const data = await res.json();
+    console.log("[api] OK", url, data);
+    return data as T;
+  } catch (err) {
+    console.error("[api] ERROR", url, err);
+    throw err;
+  } finally {
+    clearTimeout(timer);
   }
-  return config;
-});
+}
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("auth_token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
+async function postJSON<T>(path: string, body: unknown): Promise<T> {
+  const url = `${BASE}${path}`;
+  console.log("[api] POST", url, body);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+    const data = await res.json();
+    console.log("[api] POST OK", url, data);
+    return data as T;
+  } catch (err) {
+    console.error("[api] POST ERROR", url, err);
+    throw err;
+  } finally {
+    clearTimeout(timer);
   }
-);
+}
 
-export const scanCluster = async (options?: { mock?: boolean; kubeconfig?: string }) => {
-  const { data } = await api.post("/scan", options);
-  return data;
-};
+export function getGraph(): Promise<GraphData> {
+  return fetchJSON<GraphData>("/api/graph");
+}
 
-export const getGraph = async () => {
-  const { data } = await api.get("/graph");
-  return data;
-};
+export function getVulnerabilities(): Promise<Vulnerability[]> {
+  return fetchJSON<Vulnerability[]>("/api/vulnerabilities").then((d) =>
+    Array.isArray(d) ? d : []
+  );
+}
 
-export const getAttackPaths = async () => {
-  const { data } = await api.get("/paths");
-  return data;
-};
+export function getPaths(): Promise<AttackPath[]> {
+  return fetchJSON<AttackPath[]>("/api/paths").then((d) =>
+    Array.isArray(d) ? d : []
+  );
+}
 
-export const login = async (email: string, password: string) => {
-  const { data } = await api.post("/auth/login", { email, password });
-  return data;
-};
+export function getCriticalNode(): Promise<CriticalNode> {
+  return fetchJSON<CriticalNode>("/api/critical-node");
+}
 
-export const signup = async (name: string, email: string, password: string) => {
-  const { data } = await api.post("/auth/signup", { name, email, password });
-  return data;
-};
+export function simulate(nodeId: string): Promise<SimulationResult> {
+  return postJSON<SimulationResult>("/api/simulate", { nodeId });
+}
 
-export default api;
+export async function getReport(): Promise<string> {
+  const data = await fetchJSON<unknown>("/api/report");
+  if (typeof data === "string") return data;
+  const d = data as Record<string, unknown>;
+  return typeof d.content === "string"
+    ? d.content
+    : JSON.stringify(data, null, 2);
+}

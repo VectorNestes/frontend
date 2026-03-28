@@ -1,16 +1,37 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Kubeview — Kubernetes Attack Path Visualizer",
-  description: "Understand how attackers move through your cluster — not just where vulnerabilities exist.",
+  description:
+    "Understand how attackers move through your cluster — not just where vulnerabilities exist.",
   keywords: ["kubernetes", "security", "attack paths", "RBAC", "CVE"],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className="dark">
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         {children}
         <Toaster

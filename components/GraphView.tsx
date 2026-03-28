@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -14,90 +14,105 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useAppStore } from "@/store/useAppStore";
 import CustomNode from "./CustomNode";
-import NodeDetails from "./NodeDetails";
-import { GraphNode } from "@/lib/mockData";
 
 const nodeTypes: NodeTypes = { customNode: CustomNode };
 
 export default function GraphView() {
-  const { nodes: storeNodes, edges: storeEdges, setSelectedNode } = useAppStore();
-  const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
+  const {
+    graphData,
+    selectedNodeId,
+    setSelectedNodeId,
+    vulnerabilities,
+    activeView,
+  } = useAppStore();
 
-  useEffect(() => { setNodes(storeNodes); }, [storeNodes, setNodes]);
-  useEffect(() => { setEdges(storeEdges); }, [storeEdges, setEdges]);
+  // Augment node data with vulnerability info and risk scores
+  const augmentedNodes = useMemo(() => {
+    const vulnMap = new Map(vulnerabilities.map((v) => [v.nodeId, v]));
+    const showRisk = activeView === "vulnerabilities";
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node.data as GraphNode);
-  }, [setSelectedNode]);
+    return graphData.nodes.map((n) => {
+      const vuln = vulnMap.get(n.id);
+      return {
+        ...n,
+        selected: n.id === selectedNodeId,
+        data: {
+          ...n.data,
+          hasVulnerability: !!vuln,
+          riskScore: showRisk ? vuln?.riskScore : undefined,
+        },
+      };
+    });
+  }, [graphData.nodes, vulnerabilities, activeView, selectedNodeId]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(augmentedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(graphData.edges);
+
+  useEffect(() => {
+    setNodes(augmentedNodes);
+  }, [augmentedNodes, setNodes]);
+
+  useEffect(() => {
+    setEdges(graphData.edges);
+  }, [graphData.edges, setEdges]);
+
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      setSelectedNodeId(node.id);
+    },
+    [setSelectedNodeId]
+  );
 
   const onPaneClick = useCallback(() => {
-    setSelectedNode(null);
-  }, [setSelectedNode]);
+    setSelectedNodeId(null);
+  }, [setSelectedNodeId]);
 
-  return (
-    <div className="relative w-full h-full">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={onNodeClick}
-        onPaneClick={onPaneClick}
-        nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.3}
-        maxZoom={2}
-        proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{ type: "smoothstep" }}
-      >
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={24}
-          size={1}
-          color="#27272A"
-        />
-        <Controls showInteractive={false} />
-        <MiniMap
-          nodeColor={(n) => {
-            const d = n.data as GraphNode;
-            if (d.isCrownJewel) return "#DC2626";
-            if (d.type === "serviceaccount") return "#7C3AED";
-            if (d.type === "role") return "#D97706";
-            return "#3F3F46";
-          }}
-          maskColor="rgba(11,11,12,0.85)"
-        />
-      </ReactFlow>
-
-      {/* Legend */}
-      <div className="absolute top-4 right-4 card p-3 text-xs space-y-2 shadow-md z-10">
-        <p className="section-label mb-2">Node types</p>
-        {[
-          { dot: "bg-ink-tertiary",  label: "Pod / Internet" },
-          { dot: "bg-violet",        label: "Service account" },
-          { dot: "bg-amber",         label: "Role" },
-          { dot: "bg-danger",        label: "Secret / Crown jewel" },
-        ].map(({ dot, label }) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${dot} shrink-0`} />
-            <span className="text-ink-tertiary">{label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Node count */}
-      <div className="absolute top-4 left-4 z-10">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span className="text-xs text-ink-secondary font-mono">
-            {nodes.length} nodes · {edges.length} edges
-          </span>
+  if (graphData.nodes.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-canvas">
+        <div className="text-center">
+          <p className="text-sm text-ink-tertiary">No cluster data loaded.</p>
+          <p className="text-xs text-ink-disabled mt-1">
+            Run the CLI ingestion command to populate the graph.
+          </p>
         </div>
       </div>
+    );
+  }
 
-      <NodeDetails />
-    </div>
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onNodeClick={onNodeClick}
+      onPaneClick={onPaneClick}
+      nodeTypes={nodeTypes}
+      fitView
+      fitViewOptions={{ padding: 0.15 }}
+      minZoom={0.2}
+      maxZoom={2.5}
+      proOptions={{ hideAttribution: true }}
+      defaultEdgeOptions={{ type: "smoothstep" }}
+    >
+      <Background
+        variant={BackgroundVariant.Dots}
+        gap={24}
+        size={1}
+        color="#27272A"
+      />
+      <Controls showInteractive={false} />
+      <MiniMap
+        nodeColor={(n) => {
+          const t = n.data?.apiNode?.type;
+          if (t === "secret") return "#DC2626";
+          if (t === "serviceaccount") return "#7C3AED";
+          if (t === "role") return "#D97706";
+          return "#3F3F46";
+        }}
+        maskColor="rgba(11,11,12,0.85)"
+      />
+    </ReactFlow>
   );
 }

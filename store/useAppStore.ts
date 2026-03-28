@@ -1,126 +1,254 @@
 import { create } from "zustand";
-import { Node, Edge } from "reactflow";
-import {
-  GraphNode,
+import { Node, Edge, MarkerType } from "reactflow";
+import Dagre from "@dagrejs/dagre";
+import type {
+  Vulnerability,
   AttackPath,
-  getFlowNodes,
-  getFlowEdges,
-  mockAttackPaths,
-} from "@/lib/mockData";
+  CriticalNode,
+  SimulationResult,
+  ApiNode,
+  ApiEdge,
+} from "@/lib/types";
+
+export type ActiveView =
+  | "overview"
+  | "paths"
+  | "vulnerabilities"
+  | "critical"
+  | "report";
+
+const NODE_W = 160;
+const NODE_H = 60;
+
+function defaultEdgeStyle() {
+  return {
+    animated: false,
+    style: { stroke: "rgba(63,63,70,0.8)", strokeWidth: 1.5 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "rgba(63,63,70,0.8)" },
+  };
+}
+
+function runDagre(
+  apiNodes: ApiNode[],
+  apiEdges: ApiEdge[]
+): { nodes: Node[]; edges: Edge[] } {
+  const g = new Dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({
+    rankdir: "LR",
+    nodesep: 60,
+    ranksep: 120,
+    marginx: 40,
+    marginy: 40,
+  });
+
+  apiNodes.forEach((n) => g.setNode(n.id, { width: NODE_W, height: NODE_H }));
+  apiEdges.forEach((e) => {
+    if (g.hasNode(e.source) && g.hasNode(e.target)) {
+      g.setEdge(e.source, e.target);
+    }
+  });
+
+  Dagre.layout(g);
+
+  const nodes: Node[] = apiNodes.map((n) => {
+    const pos = g.node(n.id) ?? { x: 0, y: 0 };
+    return {
+      id: n.id,
+      type: "customNode",
+      position: { x: pos.x - NODE_W / 2, y: pos.y - NODE_H / 2 },
+      data: {
+        apiNode: n,
+        highlighted: false,
+        dimmed: false,
+        isCritical: false,
+      },
+    };
+  });
+
+  const edges: Edge[] = apiEdges.map((e) => ({
+    id: e.id,
+    source: e.source,
+    target: e.target,
+    type: "smoothstep",
+    ...defaultEdgeStyle(),
+  }));
+
+  return { nodes, edges };
+}
 
 interface AppState {
-  // Auth
+  // Auth (used by login/signup/settings)
   user: { name: string; email: string } | null;
-  isAuthenticated: boolean;
   setUser: (user: { name: string; email: string } | null) => void;
 
-  // Graph
-  nodes: Node[];
-  edges: Edge[];
-  selectedNode: GraphNode | null;
-  isNodePanelOpen: boolean;
-  highlightedPath: string[] | null;
-  setSelectedNode: (node: GraphNode | null) => void;
-  setNodePanelOpen: (open: boolean) => void;
-  setHighlightedPath: (path: string[] | null) => void;
-  refreshGraph: (path?: string[]) => void;
+  graphData: { nodes: Node[]; edges: Edge[] };
+  _rawNodes: ApiNode[];
+  _rawEdges: ApiEdge[];
 
-  // Attack Paths
-  attackPaths: AttackPath[];
-  selectedPath: AttackPath | null;
-  setSelectedPath: (path: AttackPath | null) => void;
+  selectedNodeId: string | null;
+  activePaths: AttackPath[];
+  selectedPathIndex: number | null;
+  vulnerabilities: Vulnerability[];
+  criticalNode: CriticalNode | null;
+  simulationResult: SimulationResult | null;
+  activeView: ActiveView;
+  report: string;
+  loading: Record<string, boolean>;
+  errors: Record<string, string>;
 
-  // Scan
-  isScanning: boolean;
-  scanComplete: boolean;
-  scanLogs: Array<{ text: string; type: string; timestamp: string }>;
-  useMockMode: boolean;
-  setScanning: (v: boolean) => void;
-  setScanComplete: (v: boolean) => void;
-  addScanLog: (log: { text: string; type: string }) => void;
-  clearScanLogs: () => void;
-  setMockMode: (v: boolean) => void;
-
-  // UI
-  sidebarCollapsed: boolean;
-  toggleSidebar: () => void;
+  setActiveView: (view: ActiveView) => void;
+  setSelectedNodeId: (id: string | null) => void;
+  loadGraph: (nodes: ApiNode[], edges: ApiEdge[]) => void;
+  setVulnerabilities: (v: Vulnerability[]) => void;
+  setActivePaths: (p: AttackPath[]) => void;
+  setCriticalNode: (n: CriticalNode | null) => void;
+  setSimulationResult: (r: SimulationResult | null) => void;
+  setReport: (r: string) => void;
+  setLoading: (key: string, v: boolean) => void;
+  setError: (key: string, msg: string) => void;
+  clearError: (key: string) => void;
+  highlightPath: (index: number | null) => void;
+  highlightCritical: (nodeId: string | null) => void;
+  resetGraphStyles: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  // Auth
   user: null,
-  isAuthenticated: false,
-  setUser: (user) =>
-    set({ user, isAuthenticated: !!user }),
+  setUser: (user) => set({ user }),
 
-  // Graph
-  nodes: getFlowNodes(),
-  edges: getFlowEdges(),
-  selectedNode: null,
-  isNodePanelOpen: false,
-  highlightedPath: null,
+  graphData: { nodes: [], edges: [] },
+  _rawNodes: [],
+  _rawEdges: [],
+  selectedNodeId: null,
+  activePaths: [],
+  selectedPathIndex: null,
+  vulnerabilities: [],
+  criticalNode: null,
+  simulationResult: null,
+  activeView: "overview",
+  report: "",
+  loading: {},
+  errors: {},
 
-  setSelectedNode: (node) =>
-    set({ selectedNode: node, isNodePanelOpen: !!node }),
-
-  setNodePanelOpen: (open) =>
-    set({ isNodePanelOpen: open, selectedNode: open ? get().selectedNode : null }),
-
-  setHighlightedPath: (path) => {
+  setActiveView: (view) => {
+    // Reset styles when switching views
+    const { graphData } = get();
     set({
-      highlightedPath: path,
-      nodes: getFlowNodes(path ?? undefined),
-      edges: getFlowEdges(path ?? undefined),
+      activeView: view,
+      selectedNodeId: null,
+      selectedPathIndex: null,
+      simulationResult: null,
+      graphData: {
+        nodes: graphData.nodes.map((n) => ({
+          ...n,
+          data: { ...n.data, highlighted: false, dimmed: false, isCritical: false },
+        })),
+        edges: graphData.edges.map((e) => ({
+          ...e,
+          ...defaultEdgeStyle(),
+        })),
+      },
     });
   },
 
-  refreshGraph: (path) => {
-    set({
-      nodes: getFlowNodes(path),
-      edges: getFlowEdges(path),
-    });
+  setSelectedNodeId: (id) => set({ selectedNodeId: id }),
+
+  loadGraph: (apiNodes, apiEdges) => {
+    console.log("[store] loadGraph", apiNodes.length, "nodes,", apiEdges.length, "edges");
+    const { nodes, edges } = runDagre(apiNodes, apiEdges);
+    set({ graphData: { nodes, edges }, _rawNodes: apiNodes, _rawEdges: apiEdges });
   },
 
-  // Attack Paths
-  attackPaths: mockAttackPaths,
-  selectedPath: null,
-  setSelectedPath: (path) => {
-    set({ selectedPath: path });
-    if (path) {
-      get().setHighlightedPath(path.nodes);
-    } else {
-      get().setHighlightedPath(null);
-    }
-  },
+  setVulnerabilities: (v) => set({ vulnerabilities: v }),
+  setActivePaths: (p) => set({ activePaths: p }),
+  setCriticalNode: (n) => set({ criticalNode: n }),
+  setSimulationResult: (r) => set({ simulationResult: r }),
+  setReport: (r) => set({ report: r }),
 
-  // Scan
-  isScanning: false,
-  scanComplete: false,
-  scanLogs: [],
-  useMockMode: true,
+  setLoading: (key, v) =>
+    set((s) => ({ loading: { ...s.loading, [key]: v } })),
 
-  setScanning: (v) => set({ isScanning: v }),
-  setScanComplete: (v) => set({ scanComplete: v }),
-  addScanLog: (log) =>
-    set((state) => ({
-      scanLogs: [
-        ...state.scanLogs,
-        {
-          ...log,
-          timestamp: new Date().toLocaleTimeString("en-US", {
-            hour12: false,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          }),
+  setError: (key, msg) =>
+    set((s) => ({ errors: { ...s.errors, [key]: msg } })),
+
+  clearError: (key) =>
+    set((s) => {
+      const next = { ...s.errors };
+      delete next[key];
+      return { errors: next };
+    }),
+
+  highlightPath: (index) => {
+    const { activePaths, graphData } = get();
+    if (index === null) {
+      set({
+        selectedPathIndex: null,
+        graphData: {
+          nodes: graphData.nodes.map((n) => ({
+            ...n,
+            data: { ...n.data, highlighted: false, dimmed: false },
+          })),
+          edges: graphData.edges.map((e) => ({ ...e, ...defaultEdgeStyle() })),
         },
-      ],
-    })),
-  clearScanLogs: () => set({ scanLogs: [], scanComplete: false }),
-  setMockMode: (v) => set({ useMockMode: v }),
+      });
+      return;
+    }
+    const path = activePaths[index];
+    if (!path) return;
+    const pathSet = new Set(path.nodes);
+    set({
+      selectedPathIndex: index,
+      graphData: {
+        nodes: graphData.nodes.map((n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            highlighted: pathSet.has(n.id),
+            dimmed: !pathSet.has(n.id),
+          },
+        })),
+        edges: graphData.edges.map((e) => {
+          const on = pathSet.has(e.source) && pathSet.has(e.target);
+          return {
+            ...e,
+            animated: on,
+            style: on
+              ? { stroke: "#DC2626", strokeWidth: 2 }
+              : { stroke: "rgba(63,63,70,0.2)", strokeWidth: 1 },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: on ? "#DC2626" : "rgba(63,63,70,0.2)",
+            },
+          };
+        }),
+      },
+    });
+  },
 
-  // UI
-  sidebarCollapsed: false,
-  toggleSidebar: () =>
-    set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+  highlightCritical: (nodeId) => {
+    const { graphData } = get();
+    set({
+      graphData: {
+        ...graphData,
+        nodes: graphData.nodes.map((n) => ({
+          ...n,
+          data: { ...n.data, isCritical: n.id === nodeId },
+        })),
+      },
+    });
+  },
+
+  resetGraphStyles: () => {
+    const { graphData } = get();
+    set({
+      graphData: {
+        nodes: graphData.nodes.map((n) => ({
+          ...n,
+          data: { ...n.data, highlighted: false, dimmed: false, isCritical: false },
+        })),
+        edges: graphData.edges.map((e) => ({ ...e, ...defaultEdgeStyle() })),
+      },
+    });
+  },
 }));

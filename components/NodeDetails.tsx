@@ -1,198 +1,180 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, AlertTriangle, Shield, Key, ChevronRight, Info, Bug } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
+import { simulate } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { CVE, GraphNode } from "@/lib/mockData";
 
-const riskLabel: Record<string, string> = {
-  critical: "badge-critical",
-  high:     "badge-high",
-  medium:   "badge-medium",
-  low:      "badge-low",
-};
-
-const cveBadge: Record<CVE["severity"], string> = {
-  critical: "badge-critical",
-  high:     "badge-high",
-  medium:   "badge-medium",
-  low:      "badge-low",
-};
-
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-2.5 border-b border-border last:border-0">
-      <span className="text-xs text-ink-tertiary shrink-0">{label}</span>
-      <span className="text-xs text-ink-secondary text-right">{value}</span>
-    </div>
-  );
-}
-
-function whyRisky(node: GraphNode): string {
-  if (node.isCrownJewel)
-    return "Crown jewel asset. Any access here represents full compromise of this resource — often leading to data breach or lateral movement.";
-  if (node.permissions?.some((p) => p.includes("*")))
-    return "Wildcard permissions grant unrestricted access to cluster resources. This is functionally equivalent to root access.";
-  if (node.isEntryPoint)
-    return "Internet-accessible entry point. Exploitation of this node requires only network reachability, not prior cluster access.";
-  if ((node.cves?.length ?? 0) > 0)
-    return `${node.cves!.length} known CVE(s) present. Successful exploitation may allow code execution or privilege escalation.`;
-  return "Participates in one or more attack paths. Compromise enables lateral movement toward crown jewel assets.";
+function riskBadgeClass(score: number) {
+  if (score >= 80) return "badge-critical";
+  if (score >= 60) return "badge-high";
+  if (score >= 40) return "badge-medium";
+  return "badge-low";
 }
 
 export default function NodeDetails() {
-  const { selectedNode, isNodePanelOpen, setNodePanelOpen } = useAppStore();
+  const {
+    selectedNodeId,
+    setSelectedNodeId,
+    graphData,
+    vulnerabilities,
+    simulationResult,
+    setSimulationResult,
+  } = useAppStore();
+
+  const [simulating, setSimulating] = useState(false);
+  const [simError, setSimError] = useState<string | null>(null);
+
+  const node = selectedNodeId
+    ? graphData.nodes.find((n) => n.id === selectedNodeId)
+    : null;
+
+  const vuln = selectedNodeId
+    ? vulnerabilities.find((v) => v.nodeId === selectedNodeId)
+    : null;
+
+  const handleClose = () => {
+    setSelectedNodeId(null);
+    setSimulationResult(null);
+    setSimError(null);
+  };
+
+  const handleSimulate = async () => {
+    if (!selectedNodeId) return;
+    setSimulating(true);
+    setSimError(null);
+    try {
+      const result = await simulate(selectedNodeId);
+      setSimulationResult(result);
+    } catch (e: unknown) {
+      const msg =
+        (e as { response?: { data?: { error?: string } }; message?: string })
+          ?.response?.data?.error ??
+        (e as { message?: string })?.message ??
+        "Simulation failed";
+      setSimError(msg);
+    } finally {
+      setSimulating(false);
+    }
+  };
 
   return (
     <AnimatePresence>
-      {isNodePanelOpen && selectedNode && (
+      {node && (
         <motion.aside
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 16 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute top-0 right-0 h-full w-72 bg-surface border-l border-border flex flex-col overflow-hidden z-20"
-          style={{ boxShadow: "panel" }}
+          className="absolute top-0 right-0 h-full w-80 bg-surface border-l border-border flex flex-col overflow-hidden z-20"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <div className="flex items-center gap-2">
-              <span className="text-2xs font-semibold text-ink-tertiary uppercase tracking-wider">
-                {selectedNode.type}
-              </span>
-              <span className={cn("text-2xs", riskLabel[selectedNode.riskLevel])}>
-                {selectedNode.riskLevel}
-              </span>
-            </div>
+            <span className="text-xs font-semibold text-ink">Node Details</span>
             <button
-              onClick={() => setNodePanelOpen(false)}
+              onClick={handleClose}
               className="btn-ghost h-7 w-7 p-0 justify-center"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Scroll body */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Name + tags */}
-            <div className="px-4 py-4 border-b border-border">
-              <p className="text-sm font-semibold text-ink mb-2">{selectedNode.label}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedNode.isCrownJewel && (
-                  <span className="badge-critical">Crown jewel</span>
-                )}
-                {selectedNode.isEntryPoint && (
-                  <span className="badge-medium">Entry point</span>
-                )}
-                {selectedNode.namespace && (
-                  <span className="text-2xs px-2 py-0.5 rounded bg-elevated border border-border text-ink-tertiary font-mono">
-                    ns/{selectedNode.namespace}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Risk score */}
-            <div className="px-4 py-4 border-b border-border">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-ink-tertiary">Risk score</span>
-                <span className="text-sm font-semibold text-ink tabular">
-                  {selectedNode.riskScore}
-                  <span className="text-ink-tertiary font-normal">/100</span>
-                </span>
-              </div>
-              <div className="h-1.5 bg-elevated rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${selectedNode.riskScore}%` }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className={cn(
-                    "h-full rounded-full",
-                    selectedNode.riskScore >= 80 ? "bg-danger" :
-                    selectedNode.riskScore >= 60 ? "bg-amber" : "bg-violet"
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Why risky */}
-            <div className="px-4 py-4 border-b border-border">
-              <div className="flex items-center gap-1.5 mb-2">
-                <Info className="w-3.5 h-3.5 text-ink-tertiary" />
-                <span className="text-xs font-medium text-ink-secondary">Why is this risky?</span>
-              </div>
-              <p className="text-xs text-ink-secondary leading-relaxed">
-                {whyRisky(selectedNode)}
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Node ID */}
+            <div>
+              <p className="text-2xs text-ink-tertiary mb-1">Node ID</p>
+              <p className="text-sm font-mono font-semibold text-ink break-all">
+                {node.id}
               </p>
             </div>
 
-            {/* Details rows */}
-            <div className="px-4 py-2 border-b border-border">
-              <span className="text-xs font-medium text-ink-secondary block mb-1">Details</span>
-              <Row label="Type"       value={selectedNode.type} />
-              {selectedNode.namespace && <Row label="Namespace" value={selectedNode.namespace} />}
-              <Row label="Risk level" value={
-                <span className={cn(riskLabel[selectedNode.riskLevel])}>{selectedNode.riskLevel}</span>
-              } />
+            {/* Type */}
+            <div>
+              <p className="text-2xs text-ink-tertiary mb-1">Type</p>
+              <p className="text-sm text-ink-secondary">
+                {node.data?.apiNode?.type ?? "—"}
+              </p>
             </div>
 
-            {/* Permissions */}
-            {(selectedNode.permissions?.length ?? 0) > 0 && (
-              <div className="px-4 py-4 border-b border-border">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Shield className="w-3.5 h-3.5 text-ink-tertiary" />
-                  <span className="text-xs font-medium text-ink-secondary">
-                    Permissions ({selectedNode.permissions!.length})
+            {/* Vulnerability section */}
+            {vuln && (
+              <div className="rounded-lg border border-border bg-elevated p-3 space-y-2.5">
+                <p className="text-2xs font-semibold text-ink-tertiary uppercase tracking-wider">
+                  Vulnerability
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-ink-secondary">{vuln.type}</span>
+                  <span className={cn("text-2xs", riskBadgeClass(vuln.riskScore))}>
+                    {vuln.riskScore}
                   </span>
                 </div>
-                <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {selectedNode.permissions!.map((p, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-elevated border border-border"
-                    >
-                      <ChevronRight className="w-3 h-3 text-ink-tertiary shrink-0" />
-                      <span className="text-2xs font-mono text-ink-secondary truncate">{p}</span>
-                    </div>
-                  ))}
-                </div>
+                {vuln.cves.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {vuln.cves.map((cve) => (
+                      <span
+                        key={cve}
+                        className="text-2xs px-1.5 py-0.5 rounded bg-surface border border-border text-ink-secondary font-mono"
+                      >
+                        {cve}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-ink-tertiary leading-relaxed">
+                  {vuln.reason}
+                </p>
               </div>
             )}
 
-            {/* CVEs */}
-            {(selectedNode.cves?.length ?? 0) > 0 && (
-              <div className="px-4 py-4">
-                <div className="flex items-center gap-1.5 mb-3">
-                  <Bug className="w-3.5 h-3.5 text-danger-text" />
-                  <span className="text-xs font-medium text-ink-secondary">
-                    CVEs ({selectedNode.cves!.length})
-                  </span>
+            {/* Simulate removal */}
+            <div className="pt-2 border-t border-border space-y-3">
+              <button
+                onClick={handleSimulate}
+                className="w-full btn-secondary h-8 text-xs justify-center"
+              >
+                {simulating ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Simulating…
+                  </>
+                ) : (
+                  "Simulate Removal"
+                )}
+              </button>
+
+              {simError && (
+                <p className="text-2xs text-danger-text">{simError}</p>
+              )}
+
+              {simulationResult && (
+                <div className="p-3 rounded-lg bg-elevated border border-border text-xs space-y-1.5">
+                  <p className="text-2xs font-semibold text-ink-tertiary uppercase tracking-wider mb-2">
+                    Simulation Result
+                  </p>
+                  <div className="flex justify-between">
+                    <span className="text-ink-tertiary">Before</span>
+                    <span className="text-ink tabular">
+                      {simulationResult.before} paths
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-ink-tertiary">After</span>
+                    <span className="text-ink tabular">
+                      {simulationResult.after} paths
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-1.5 border-t border-border">
+                    <span className="text-ink-tertiary">Impact</span>
+                    <span className="text-success-text tabular font-medium">
+                      -{simulationResult.impact} paths
+                    </span>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  {selectedNode.cves!.map((cve) => (
-                    <div key={cve.id} className="rounded-lg bg-elevated border border-border p-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-2xs font-mono font-semibold text-ink">
-                          {cve.id}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className={cn("text-2xs", cveBadge[cve.severity])}>
-                            {cve.severity}
-                          </span>
-                          <span className="text-2xs tabular text-ink-tertiary">
-                            {cve.cvss}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-2xs text-ink-tertiary leading-snug">
-                        {cve.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </motion.aside>
       )}

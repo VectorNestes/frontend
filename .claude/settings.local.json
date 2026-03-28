@@ -11,7 +11,19 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002/dashboard/attack-paths)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002/)",
       "Bash(netstat -ano)",
-      "Bash(cmd //c \"taskkill /PID 4996 /F & taskkill /PID 25828 /F\")"
+      "Bash(cmd //c \"taskkill /PID 4996 /F & taskkill /PID 25828 /F\")",
+      "Bash(npx tsc:*)",
+      "Bash(ls d:/frontend-2/.env*)",
+      "Bash(node -e \"const fs=require\\(''''fs''''\\); const buf=fs.readFileSync\\(''''dev-3010.log''''\\); console.log\\(buf.toString\\(''''utf16le''''\\).replace\\(/\\\\x00/g,''''''''\\)\\)\")",
+      "Bash(curl -s http://localhost:3010/)",
+      "Bash(curl -s --max-time 5 http://localhost:3010/)",
+      "Bash(findstr :3010)",
+      "Bash(taskkill /PID 14836 /F)",
+      "Bash(curl -s --max-time 30 http://localhost:3010/)",
+      "Bash(cmd /c \"taskkill /F /PID 14836\")",
+      "Bash(cmd /c \"taskkill /F /PID 14836 2>&1\")",
+      "Bash(powershell -Command \"Stop-Process -Id 14836 -Force\")",
+      "Bash(powershell -Command \"Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force\")"
     ]
   }
 }

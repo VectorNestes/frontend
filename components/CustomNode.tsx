@@ -3,106 +3,118 @@
 import { memo } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import { cn } from "@/lib/utils";
-import { GraphNode } from "@/lib/mockData";
+import type { ApiNode } from "@/lib/types";
 
-/* ─── Type styles ─── */
+interface NodeData {
+  apiNode: ApiNode;
+  highlighted: boolean;
+  dimmed: boolean;
+  isCritical: boolean;
+  hasVulnerability?: boolean;
+  riskScore?: number;
+}
+
 const typeConfig: Record<
-  GraphNode["type"],
-  { bg: string; border: string; label: string; dot: string }
+  string,
+  { border: string; label: string; dot: string }
 > = {
-  internet:      { bg: "bg-canvas",   border: "border-border-strong", label: "INTERNET", dot: "bg-ink-tertiary" },
-  pod:           { bg: "bg-canvas",   border: "border-border-strong", label: "POD",      dot: "bg-ink-tertiary" },
-  serviceaccount:{ bg: "bg-surface",  border: "border-violet-border", label: "SA",       dot: "bg-violet" },
-  role:          { bg: "bg-surface",  border: "border-amber-border",  label: "ROLE",     dot: "bg-amber" },
-  secret:        { bg: "bg-surface",  border: "border-danger-border", label: "SECRET",   dot: "bg-danger" },
-  namespace:     { bg: "bg-canvas",   border: "border-border",        label: "NS",       dot: "bg-ink-disabled" },
+  internet:       { border: "border-border-strong", label: "INTERNET", dot: "bg-ink-tertiary" },
+  pod:            { border: "border-border-strong", label: "POD",      dot: "bg-ink-tertiary" },
+  serviceaccount: { border: "border-violet-border", label: "SA",       dot: "bg-violet" },
+  role:           { border: "border-amber-border",  label: "ROLE",     dot: "bg-amber" },
+  secret:         { border: "border-danger-border", label: "SECRET",   dot: "bg-danger" },
 };
 
-const riskBadge: Record<GraphNode["riskLevel"], string> = {
-  critical: "badge-critical",
-  high:     "badge-high",
-  medium:   "badge-medium",
-  low:      "badge-low",
-};
+function riskBadgeClass(score: number) {
+  if (score >= 80) return "badge-critical";
+  if (score >= 60) return "badge-high";
+  return "badge-medium";
+}
+
+function riskBorderClass(score: number) {
+  if (score >= 80) return "border-danger";
+  if (score >= 60) return "border-amber";
+  return "border-violet-border";
+}
 
 export default memo(function CustomNode({
   data,
   selected,
-}: NodeProps<GraphNode & { highlighted?: boolean }>) {
-  const cfg        = typeConfig[data.type] ?? typeConfig.pod;
-  const isHighlight = data.highlighted;
-  const isCrown    = data.isCrownJewel;
-  const isEntry    = data.isEntryPoint;
+}: NodeProps<NodeData>) {
+  const nodeType = data.apiNode?.type ?? "pod";
+  const cfg = typeConfig[nodeType] ?? {
+    border: "border-border",
+    label: nodeType.toUpperCase().slice(0, 8),
+    dot: "bg-ink-disabled",
+  };
+  const hasRisk = data.riskScore !== undefined;
 
   return (
     <div
       className={cn(
-        "relative min-w-[130px] rounded-lg border px-3 py-2.5 cursor-pointer select-none",
-        "transition-all duration-150",
-        cfg.bg,
-        // Normal border
-        !isHighlight && !selected && cfg.border,
-        // Highlighted (attack path)
-        isHighlight && "border-danger bg-danger-muted shadow-md",
-        // Selected
-        selected && !isHighlight && "border-violet shadow-node-selected",
-        // Crown jewel subtle pulse
-        isCrown && !isHighlight && "animate-pulse-danger",
+        "relative rounded-lg border bg-surface px-3 py-2.5 cursor-pointer select-none transition-all duration-150 min-w-[140px]",
+        // Border priority: highlighted > selected > riskScore > type default
+        data.highlighted
+          ? "border-danger bg-danger-muted"
+          : selected
+          ? "border-violet"
+          : hasRisk
+          ? riskBorderClass(data.riskScore!)
+          : cfg.border,
+        // Dim non-path nodes
+        data.dimmed && "opacity-25",
       )}
       style={{
-        // Subtle shadow for elevated nodes
-        boxShadow: selected
-          ? "0 0 0 2px rgba(124,58,237,0.4), 0 4px 12px rgba(0,0,0,0.5)"
-          : isHighlight
-          ? "0 0 0 1.5px rgba(220,38,38,0.5), 0 4px 12px rgba(0,0,0,0.4)"
+        boxShadow: data.isCritical
+          ? "0 0 0 3px rgba(124,58,237,0.5), 0 0 0 8px rgba(124,58,237,0.1)"
+          : selected
+          ? "0 0 0 2px rgba(124,58,237,0.35)"
           : "0 1px 3px rgba(0,0,0,0.4)",
       }}
     >
-      {/* Type badge */}
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", cfg.dot)} />
-          <span className="text-2xs font-semibold text-ink-tertiary tracking-wider">
-            {cfg.label}
+      {/* Critical Node label */}
+      {data.isCritical && (
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
+          <span className="text-2xs px-2 py-0.5 rounded bg-violet-muted border border-violet-border text-violet-text">
+            Critical Node
           </span>
         </div>
-        {data.riskLevel !== "low" && (
-          <span className={cn("text-2xs", riskBadge[data.riskLevel])}>
-            {data.riskScore}
-          </span>
-        )}
+      )}
+
+      {/* Vulnerability indicator — top-right corner */}
+      {data.hasVulnerability && (
+        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-danger border-2 border-canvas" />
+      )}
+
+      {/* Type badge row */}
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span
+          className={cn(
+            "w-1.5 h-1.5 rounded-full shrink-0",
+            data.highlighted ? "bg-danger" : cfg.dot
+          )}
+        />
+        <span className="text-2xs font-semibold text-ink-tertiary tracking-wider">
+          {cfg.label}
+        </span>
       </div>
 
-      {/* Label */}
+      {/* Node ID */}
       <p
         className={cn(
-          "text-xs font-medium truncate max-w-[110px]",
-          isHighlight ? "text-danger-text" : "text-ink"
+          "text-xs font-mono font-medium truncate max-w-[130px]",
+          data.highlighted ? "text-danger-text" : "text-ink"
         )}
       >
-        {data.label}
+        {data.apiNode?.id ?? "—"}
       </p>
 
-      {/* Crown jewel indicator */}
-      {isCrown && (
+      {/* Risk score badge (vulnerabilities view) */}
+      {hasRisk && (
         <div className="mt-1.5">
-          <span className="badge-critical">crown jewel</span>
-        </div>
-      )}
-
-      {/* CVE count */}
-      {(data.cves?.length ?? 0) > 0 && (
-        <div className="mt-1">
-          <span className="text-2xs text-danger-text font-medium">
-            {data.cves!.length} CVE{data.cves!.length > 1 ? "s" : ""}
+          <span className={cn("text-2xs", riskBadgeClass(data.riskScore!))}>
+            {data.riskScore}
           </span>
-        </div>
-      )}
-
-      {/* Entry point indicator */}
-      {isEntry && !isCrown && (
-        <div className="absolute -top-2 -right-2 w-3 h-3 rounded-full bg-surface border border-border flex items-center justify-center">
-          <span className="w-1.5 h-1.5 rounded-full bg-success" />
         </div>
       )}
 
