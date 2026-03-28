@@ -1,6 +1,6 @@
 ---
 name: stitch
-description: Use Stitch MCP to generate, edit, and manage UI screens and design systems for the Kubeview project.
+description: Use Stitch MCP to generate, edit, and manage UI screens and design systems for the VECTORNETES project.
 ---
 
 # Stitch MCP Skill
@@ -15,7 +15,7 @@ Stitch is a UI design generation tool accessible via MCP. Use it to create scree
 
 ### 2. Generate screens
 - Use `generate_screen_from_text` with a detailed prompt describing the screen layout, purpose, and data shown.
-- Always specify `deviceType: "DESKTOP"` for Kubeview (it's a web dashboard).
+- Always specify `deviceType: "DESKTOP"` for VECTORNETES (it's a web dashboard).
 - Be patient — generation can take 1-2 minutes. DO NOT retry.
 
 ### 3. Edit screens
@@ -28,9 +28,9 @@ Stitch is a UI design generation tool accessible via MCP. Use it to create scree
 ### 5. Variants
 - Use `generate_variants` to produce multiple design alternatives for a screen.
 
-## Kubeview Design Guidelines
+## VECTORNETES Design Guidelines
 
-- **App name**: Kubeview
+- **App name**: VECTORNETES
 - **Theme**: Dark mode only, professional security tooling aesthetic
 - **Primary color**: Violet/purple accent (`#7C3AED`)
 - **Background**: Near-black (`#09090B` canvas, `#18181B` elevated)

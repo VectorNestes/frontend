@@ -32,9 +32,9 @@ export default function SignupPage() {
   const { setUser } = useAppStore();
 
   const [f, setF] = useState<Fields>({ name: "", email: "", password: "", confirm: "" });
-  const [showPw, setShowPw]   = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors]   = useState<Errs>({});
+  const [errors, setErrors] = useState<Errs>({});
 
   const upd = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setF((p) => ({ ...p, [k]: e.target.value }));
@@ -43,12 +43,12 @@ export default function SignupPage() {
 
   const validate = (): Errs => {
     const e: Errs = {};
-    if (!f.name.trim())             e.name    = "Required";
-    if (!f.email)                   e.email   = "Required";
+    if (!f.name.trim()) e.name = "Required";
+    if (!f.email) e.email = "Required";
     else if (!/\S+@\S+/.test(f.email)) e.email = "Invalid email";
-    if (!f.password)                e.password = "Required";
+    if (!f.password) e.password = "Required";
     else if (f.password.length < 8) e.password = "Minimum 8 characters";
-    if (!f.confirm)                 e.confirm  = "Required";
+    if (!f.confirm) e.confirm = "Required";
     else if (f.confirm !== f.password) e.confirm = "Passwords don't match";
     return e;
   };
@@ -86,11 +86,11 @@ export default function SignupPage() {
           <div className="w-6 h-6 rounded-md bg-violet flex items-center justify-center">
             <Shield className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-sm font-semibold text-ink">Kubeview</span>
+          <span className="text-sm font-semibold text-ink">VECTORNETES</span>
         </div>
 
         <h1 className="text-xl font-semibold tracking-tight text-ink mb-1"
-            style={{ letterSpacing: "-0.02em" }}>
+          style={{ letterSpacing: "-0.02em" }}>
           Create account
         </h1>
         <p className="text-sm text-ink-secondary mb-8">
@@ -156,9 +156,8 @@ export default function SignupPage() {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                        i < strength ? STRENGTH_COLOR[strength] : "bg-border-strong"
-                      }`}
+                      className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < strength ? STRENGTH_COLOR[strength] : "bg-border-strong"
+                        }`}
                     />
                   ))}
                 </div>

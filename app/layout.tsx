@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kubeview — Kubernetes Attack Path Visualizer",
+  title: "VECTORNETES — Kubernetes Attack Path Visualizer",
   description:
     "Understand how attackers move through your cluster — not just where vulnerabilities exist.",
   keywords: ["kubernetes", "security", "attack paths", "RBAC", "CVE"],
