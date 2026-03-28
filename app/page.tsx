@@ -414,7 +414,7 @@ function HeroSection({ ready }: { ready: boolean }) {
           opacity: wordsIn ? 1 : 0, transform: wordsIn ? "none" : "translateY(20px)", transition: "all 600ms 350ms"
         }}>
           <code style={{ fontFamily: "var(--mono)", fontSize: 16, color: "var(--text)", letterSpacing: 0.5 }}>
-            <span style={{ color: "var(--cyan)" }}>npx</span> k8s-av start
+            <span style={{ color: "var(--cyan)" }}>npm</span>  install -g k8s-av
           </code>
           <CopyButton text="npx k8s-av start" />
         </div>
@@ -1063,11 +1063,11 @@ function TerminalSection() {
           Map your attack surface.<br /><span style={{ color: "var(--cyan)" }}>Before they do.</span>
         </h2>
         <p style={{ fontSize: 18, color: "var(--muted)", lineHeight: 1.7, marginBottom: 36 }}>Connect your kubeconfig. Get a full attack graph in under 60 seconds. No agent. No data exfiltration. Free forever.</p>
-        <Link href="/signup" style={{ display: "inline-block", border: "2px solid var(--cyan)", color: "var(--cyan)", padding: "14px 32px", borderRadius: 6, textDecoration: "none", fontWeight: 700, fontSize: 16, marginBottom: 24, transition: "background .3s,color .3s" }}
+        {/* <Link href="/signup" style={{ display: "inline-block", border: "2px solid var(--cyan)", color: "var(--cyan)", padding: "14px 32px", borderRadius: 6, textDecoration: "none", fontWeight: 700, fontSize: 16, marginBottom: 24, transition: "background .3s,color .3s" }}
           onMouseEnter={e => { const el = e.currentTarget; el.style.background = "var(--cyan)"; el.style.color = "#000"; }}
           onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = "var(--cyan)"; }}>
           Start Free Scan →
-        </Link>
+        </Link> */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {["No agent required", "Under 60 seconds", "Free forever"].map(t => (
             <span key={t} style={{ fontFamily: "var(--mono)", fontSize: 11, border: "1px solid var(--cyan)", borderRadius: 99, padding: "4px 12px", color: "var(--cyan)" }}>{t}</span>
@@ -1164,7 +1164,7 @@ function FooterSection() {
           <div style={{ color: "var(--muted)", fontSize: 12 }}>Hackathon Build 2025</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          {[["Docs", "#"], ["GitHub", "#"], ["Status", "#"], ["Dashboard", "/dashboard"]].map(([label, href]) => (
+          {[["Docs", "/documentation"], ["GitHub", "https://github.com/VectorNestes"]].map(([label, href]) => (
             <a key={label as string} href={href as string} className="fl">{label}</a>
           ))}
         </div>
