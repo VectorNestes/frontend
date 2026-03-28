@@ -28,15 +28,15 @@ export default function DocumentationPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
-          
+
           {/* Table of Contents - Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <div className="sticky top-20 space-y-6">
               <h3 className="font-mono text-xs text-ink-tertiary tracking-widest uppercase mb-4">On this page</h3>
               <nav className="flex flex-col space-y-2">
                 {sections.map((sec) => (
-                  <a 
-                    key={sec.id} 
+                  <a
+                    key={sec.id}
                     href={`#${sec.id}`}
                     className="text-sm text-ink-secondary hover:text-violet-text transition-colors py-1 border-l-2 border-transparent hover:border-violet-text pl-3"
                   >
@@ -49,7 +49,7 @@ export default function DocumentationPage() {
 
           {/* Main Content Areas */}
           <div className="flex-1 space-y-16">
-            
+
             {/* Header */}
             <header className="space-y-6" id="header">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink">
@@ -77,7 +77,10 @@ export default function DocumentationPage() {
               <p className="text-ink-secondary">
                 👉 <a href="https://www.npmjs.com/package/k8s-av" target="_blank" rel="noopener noreferrer" className="text-violet-text hover:underline transition-colors">https://www.npmjs.com/package/k8s-av</a>
               </p>
-              <CodeBlock code="npx k8s-av start" language="bash" />
+              <div>
+                <h4 className="font-medium mb-2 text-ink-secondary">Global Install</h4>
+                <CodeBlock code={`npm install -g k8s-av\n npx k8s-av start`} language="bash" />
+              </div>
             </section>
 
             <hr className="border-border" />
@@ -86,7 +89,7 @@ export default function DocumentationPage() {
             <section id="project-overview" className="space-y-10 pt-4 scroll-mt-24">
               <div className="space-y-6">
                 <h2 className="text-3xl font-bold">1. Project Overview</h2>
-                
+
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-violet">1.1 What is K8s-AV?</h3>
                   <p className="text-ink-secondary leading-relaxed">
@@ -103,8 +106,8 @@ export default function DocumentationPage() {
 
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-violet">1.2 Problem Statement</h3>
-                  <p className="text-ink-secondary">Traditional tools answer: <br/><em>“What is vulnerable?”</em></p>
-                  <p className="text-ink-secondary">But they fail to answer: <br/><em>“How can an attacker actually exploit this?”</em></p>
+                  <p className="text-ink-secondary">Traditional tools answer: <br /><em>“What is vulnerable?”</em></p>
+                  <p className="text-ink-secondary">But they fail to answer: <br /><em>“How can an attacker actually exploit this?”</em></p>
                   <p className="text-ink-secondary">This leads to:</p>
                   <ul className="list-disc list-inside text-ink-secondary space-y-1 pl-4">
                     <li>Alert fatigue</li>
@@ -113,7 +116,7 @@ export default function DocumentationPage() {
                   </ul>
                   <div className="bg-violet/10 border border-violet/20 p-4 rounded-lg">
                     <p className="text-violet-text font-medium">
-                      👉 K8s-AV shifts the focus to: <br/>
+                      👉 K8s-AV shifts the focus to: <br />
                       <span className="text-lg font-bold text-ink">“How can an attacker move through my system?”</span>
                     </p>
                   </div>
@@ -149,7 +152,7 @@ export default function DocumentationPage() {
             {/* 2. Architecture */}
             <section id="architecture" className="space-y-8 pt-4 scroll-mt-24">
               <h2 className="text-3xl font-bold">2. Architecture</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-violet">2.1 System Layers</h3>
                 <div className="overflow-x-auto">
@@ -188,7 +191,7 @@ export default function DocumentationPage() {
 
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-violet">2.2 Data Flow</h3>
-                <CodeBlock 
+                <CodeBlock
                   code={`Kubernetes Cluster
             ↓
     CLI (kubectl scan)
@@ -203,8 +206,8 @@ export default function DocumentationPage() {
             ↓
     Backend APIs
             ↓
-    React UI`} 
-                  language="text" 
+    React UI`}
+                  language="text"
                 />
               </div>
 
@@ -270,7 +273,7 @@ export default function DocumentationPage() {
             {/* 3. Installation */}
             <section id="installation" className="space-y-8 pt-4 scroll-mt-24">
               <h2 className="text-3xl font-bold">3. Installation</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-violet">3.1 Prerequisites</h3>
                 <ul className="list-disc list-inside text-ink-secondary space-y-1">
@@ -292,10 +295,7 @@ export default function DocumentationPage() {
                     <h4 className="font-medium mb-2 text-ink-secondary">Zero Install (Recommended)</h4>
                     <CodeBlock code="npx k8s-av start" language="bash" />
                   </div>
-                  <div>
-                    <h4 className="font-medium mb-2 text-ink-secondary">Global Install</h4>
-                    <CodeBlock code={`npm install -g k8s-av\nk8s-av start`} language="bash" />
-                  </div>
+
                 </div>
               </div>
 
@@ -318,7 +318,7 @@ export default function DocumentationPage() {
             <section id="cli-reference" className="space-y-8 pt-4 scroll-mt-24">
               <h2 className="text-3xl font-bold">4. CLI Reference</h2>
               <CodeBlock code="k8s-av <command> [options]" language="bash" />
-              
+
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <h4 className="font-semibold mb-2">Start</h4>
@@ -375,17 +375,17 @@ export default function DocumentationPage() {
 
               <section id="configuration" className="space-y-4 pt-4 scroll-mt-24">
                 <h2 className="text-2xl font-bold">7. Configuration</h2>
-                <CodeBlock 
-                  code={`NEO4J_URI=bolt://localhost:7687\nNEO4J_PASSWORD=yourpassword\nAPI_PORT=3001\nUI_PORT=3000\nNVD_API_KEY=optional`} 
-                  language="env" 
+                <CodeBlock
+                  code={`NEO4J_URI=bolt://localhost:7687\nNEO4J_PASSWORD=yourpassword\nAPI_PORT=3001\nUI_PORT=3000\nNVD_API_KEY=optional`}
+                  language="env"
                 />
               </section>
 
               <section id="troubleshooting" className="space-y-4 pt-4 scroll-mt-24">
                 <h2 className="text-2xl font-bold">8. Troubleshooting</h2>
-                <CodeBlock 
-                  code={`docker ps\nkubectl config get-contexts\ndocker restart k8sav-neo4j`} 
-                  language="bash" 
+                <CodeBlock
+                  code={`docker ps\nkubectl config get-contexts\ndocker restart k8sav-neo4j`}
+                  language="bash"
                 />
               </section>
 
@@ -401,9 +401,9 @@ export default function DocumentationPage() {
                 </div>
                 <div className="space-y-3">
                   <h2 className="text-xl font-bold flex items-center gap-2">🤝 Contributing</h2>
-                  <CodeBlock 
-                    code={`git clone <repo>\nnpm install\nnpm run dev`} 
-                    language="bash" 
+                  <CodeBlock
+                    code={`git clone <repo>\nnpm install\nnpm run dev`}
+                    language="bash"
                   />
                 </div>
               </section>
