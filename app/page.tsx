@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import CopyButton from "@/components/CopyButton";
 
 /* ─── GLOBAL STYLES ─── */
 const CSS = `
@@ -405,6 +406,19 @@ function HeroSection({ ready }: { ready: boolean }) {
           <span style={{ background: "linear-gradient(135deg, #F97316, #FB923C)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "block", transform: wordsIn ? "translateY(0)" : "translateY(110%)", opacity: wordsIn ? 1 : 0, transition: "transform 700ms cubic-bezier(.16,1,.3,1) 300ms, opacity 700ms 300ms" }}>Visualized.</span>
         </h1>
 
+        {/* Install Command */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: "rgba(0,0,0,0.4)", border: "1px solid var(--border)",
+          borderRadius: 8, padding: "12px 16px", marginTop: 24, maxWidth: 360,
+          opacity: wordsIn ? 1 : 0, transform: wordsIn ? "none" : "translateY(20px)", transition: "all 600ms 350ms"
+        }}>
+          <code style={{ fontFamily: "var(--mono)", fontSize: 16, color: "var(--text)", letterSpacing: 0.5 }}>
+            <span style={{ color: "var(--cyan)" }}>npx</span> k8s-av start
+          </code>
+          <CopyButton text="npx k8s-av start" />
+        </div>
+
         {/* Subheading */}
         <p style={{ fontSize: 18, color: "var(--muted)", maxWidth: 480, marginTop: 28, marginBottom: 40, lineHeight: 1.7, opacity: wordsIn ? 1 : 0, transform: wordsIn ? "none" : "translateY(20px)", transition: "all 600ms 400ms", textAlign: "left" }}>
           Understand how attackers move through your cluster —{" "}
@@ -444,11 +458,11 @@ function AttackGraphSection() {
   const progressRef = useRef(0);
   const hasEnteredRef = useRef(false); // ← KEY: ref so canvas loop reads it without stale closure
   const termPhaseRef = useRef(-1);
-  const queries = [
-    "MATCH (n:Pod) RETURN n",
-    "MATCH (a)-[r:CAN_READ]->(b) RETURN a,r,b",
-    "MATCH path = shortestPath((e:EntryPoint)-[*]->(c:CrownJewel)) RETURN path"
-  ];
+  // const queries = [
+  //   "MATCH (n:Pod) RETURN n",
+  //   "MATCH (a)-[r:CAN_READ]->(b) RETURN a,r,b",
+  //   "MATCH path = shortestPath((e:EntryPoint)-[*]->(c:CrownJewel)) RETURN path"
+  // ];
 
   useEffect(() => {
     const onScroll = () => {
@@ -474,8 +488,8 @@ function AttackGraphSection() {
       if (ph !== termPhaseRef.current) {
         termPhaseRef.current = ph;
         let i = 0; setTermText("");
-        const q = queries[ph];
-        const iv = setInterval(() => { i++; setTermText(q.slice(0, i)); if (i >= q.length) clearInterval(iv); }, 40);
+        // const q = queries[ph];
+        // const iv = setInterval(() => { i++; setTermText(q.slice(0, i)); if (i >= q.length) clearInterval(iv); }, 40);
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -604,7 +618,7 @@ function AttackGraphSection() {
   ];
 
   return (
-    <div ref={outerRef} style={{ height: "300vh", position: "relative" }}>
+    <div ref={outerRef} style={{ height: "100vh", position: "relative" }}>
       <div style={{ position: "sticky", top: 0, height: "100vh", display: "flex", overflow: "hidden", background: "var(--bg)" }}>
         <div style={{ width: "42%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 48px 80px 160px", position: "relative", zIndex: 2 }}>
           <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--cyan)", letterSpacing: 4, marginBottom: 48 }}>ATTACK GRAPH BUILD</div>
@@ -623,7 +637,7 @@ function AttackGraphSection() {
               </div>
             ))}
           </div>
-          <div style={{ position: "absolute", bottom: 40, left: 160, right: 48 }}>
+          <div style={{ position: "absolute", bottom: 20, left: 160, right: 48 }}>
             <div style={{ height: 2, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
               <div style={{ height: "100%", width: `${(phase / 2) * 100}%`, background: "linear-gradient(90deg, var(--cyan), var(--primary))", borderRadius: 2, transition: "width 0.4s" }} />
             </div>
@@ -633,15 +647,15 @@ function AttackGraphSection() {
         <div style={{ flex: 1, height: "100%", position: "relative" }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 60% 40%, rgba(0,245,255,0.04) 0%, transparent 65%)", pointerEvents: "none", zIndex: 1 }} />
           <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-          <div style={{ position: "absolute", bottom: 32, right: 32, background: "rgba(5,5,8,0.9)", border: "1px solid rgba(0,245,255,0.2)", borderRadius: 8, padding: "12px 18px", fontFamily: "var(--mono)", fontSize: 12, color: "var(--cyan)", maxWidth: 400, zIndex: 10, backdropFilter: "blur(8px)" }}>
+          {/* <div style={{ position: "absolute", bottom: 32, right: 32, background: "rgba(5,5,8,0.9)", border: "1px solid rgba(0,245,255,0.2)", borderRadius: 8, padding: "12px 18px", fontFamily: "var(--mono)", fontSize: 12, color: "var(--cyan)", maxWidth: 400, zIndex: 10, backdropFilter: "blur(8px)" }}>
             <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, letterSpacing: 2, marginBottom: 6 }}>GRAPH QUERY</div>
             <span style={{ color: "var(--muted)" }}>{"> "}</span>{termText}<span style={{ animation: "blink .8s infinite" }}>_</span>
-          </div>
-          {phase === 2 && (
+          </div> */}
+          {/* {phase === 2 && (
             <div style={{ position: "absolute", top: 32, right: 32, background: "rgba(255,49,49,0.08)", border: "2px solid var(--red)", borderRadius: 8, padding: "12px 20px", fontFamily: "var(--mono)", fontSize: 12, color: "var(--red)", animation: "blink 2s infinite", textAlign: "center", boxShadow: "0 0 30px rgba(255,49,49,0.3)", zIndex: 10, whiteSpace: "nowrap" }}>
               ⚠ CROWN JEWEL REACHABLE — Database-prod
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>
