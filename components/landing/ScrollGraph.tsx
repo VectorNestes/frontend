@@ -35,30 +35,30 @@ interface SNode {
 
 interface SEdge {
   from: string;
-  to:   string;
+  to: string;
   attack?: boolean; // part of the highlighted attack path
 }
 
 const NODES: SNode[] = [
-  { id: "internet",  x: 0.08, y: 0.50, label: "Internet",       kind: "internet" },
-  { id: "webapp",    x: 0.26, y: 0.28, label: "webapp-pod",      kind: "pod" },
-  { id: "api",       x: 0.26, y: 0.72, label: "api-pod",         kind: "pod" },
-  { id: "sa-def",    x: 0.46, y: 0.35, label: "default-sa",      kind: "sa" },
-  { id: "sa-adm",    x: 0.46, y: 0.65, label: "cluster-admin-sa",kind: "sa" },
-  { id: "role-ca",   x: 0.64, y: 0.50, label: "cluster-admin",   kind: "role" },
-  { id: "secret-db", x: 0.82, y: 0.30, label: "db-credentials",  kind: "secret", crown: true },
-  { id: "secret-key",x: 0.82, y: 0.70, label: "api-keys",        kind: "secret", crown: true },
+  { id: "internet", x: 0.08, y: 0.50, label: "Internet", kind: "internet" },
+  { id: "webapp", x: 0.26, y: 0.28, label: "webapp-pod", kind: "pod" },
+  { id: "api", x: 0.26, y: 0.72, label: "api-pod", kind: "pod" },
+  { id: "sa-def", x: 0.46, y: 0.35, label: "default-sa", kind: "sa" },
+  { id: "sa-adm", x: 0.46, y: 0.65, label: "cluster-admin-sa", kind: "sa" },
+  { id: "role-ca", x: 0.64, y: 0.50, label: "cluster-admin", kind: "role" },
+  { id: "secret-db", x: 0.82, y: 0.30, label: "db-credentials", kind: "secret", crown: true },
+  { id: "secret-key", x: 0.82, y: 0.70, label: "api-keys", kind: "secret", crown: true },
 ];
 
 const EDGES: SEdge[] = [
-  { from: "internet",  to: "webapp",    attack: true },
-  { from: "internet",  to: "api" },
-  { from: "webapp",    to: "sa-def",    attack: true },
-  { from: "api",       to: "sa-adm" },
-  { from: "sa-def",    to: "role-ca",   attack: true },
-  { from: "sa-adm",    to: "role-ca" },
-  { from: "role-ca",   to: "secret-db", attack: true },
-  { from: "role-ca",   to: "secret-key" },
+  { from: "internet", to: "webapp", attack: true },
+  { from: "internet", to: "api" },
+  { from: "webapp", to: "sa-def", attack: true },
+  { from: "api", to: "sa-adm" },
+  { from: "sa-def", to: "role-ca", attack: true },
+  { from: "sa-adm", to: "role-ca" },
+  { from: "role-ca", to: "secret-db", attack: true },
+  { from: "role-ca", to: "secret-key" },
 ];
 
 const ATTACK_PATH = ["internet", "webapp", "sa-def", "role-ca", "secret-db"];
@@ -92,17 +92,17 @@ function getScrollLabel(
   if (progress < 0.15) return { heading: "Clusters are complex.", body: "Hundreds of pods, accounts, and bindings — interconnected." };
   if (progress < 0.40) return { heading: "Permissions create hidden paths.", body: "Every RBAC binding is a potential lateral movement opportunity." };
   if (progress < 0.65) return { heading: "Attackers don't guess. They traverse.", body: "A single compromised pod can reach your most sensitive secrets." };
-  if (progress < 0.88) return { heading: "Find the path before they do.", body: "Kubeview maps every possible route from exposure to crown jewel." };
+  if (progress < 0.88) return { heading: "Find the path before they do.", body: "VECTORNETES maps every possible route from exposure to crown jewel." };
   return { heading: "You're in control.", body: "Detect, prioritise, and remediate — with full context." };
 }
 
 /* ─── node styling ─── */
 const kindStyle: Record<SNode["kind"], { fill: string; stroke: string; labelColor: string; radius: number }> = {
-  internet: { fill: "#18181B", stroke: "#3F3F46",  labelColor: "#A1A1AA", radius: 22 },
-  pod:      { fill: "#18181B", stroke: "#3F3F46",  labelColor: "#A1A1AA", radius: 18 },
-  sa:       { fill: "#1C1425", stroke: "#4C1D95",  labelColor: "#A78BFA", radius: 18 },
-  role:     { fill: "#1C1608", stroke: "#78350F",  labelColor: "#FCD34D", radius: 18 },
-  secret:   { fill: "#1C0A0A", stroke: "#7F1D1D",  labelColor: "#FCA5A5", radius: 20 },
+  internet: { fill: "#18181B", stroke: "#3F3F46", labelColor: "#A1A1AA", radius: 22 },
+  pod: { fill: "#18181B", stroke: "#3F3F46", labelColor: "#A1A1AA", radius: 18 },
+  sa: { fill: "#1C1425", stroke: "#4C1D95", labelColor: "#A78BFA", radius: 18 },
+  role: { fill: "#1C1608", stroke: "#78350F", labelColor: "#FCD34D", radius: 18 },
+  secret: { fill: "#1C0A0A", stroke: "#7F1D1D", labelColor: "#FCA5A5", radius: 20 },
 };
 
 /* ─── canvas renderer ─── */
@@ -141,19 +141,19 @@ function renderFrame(
   /* ── edges ── */
   visibleEdges.forEach((edge) => {
     const from = nodeMap.get(edge.from);
-    const to   = nodeMap.get(edge.to);
+    const to = nodeMap.get(edge.to);
     if (!from || !to) return;
 
     const fp = getPos(from);
     const tp = getPos(to);
 
     const fromVisible = visibleNodes.includes(edge.from);
-    const toVisible   = visibleNodes.includes(edge.to);
+    const toVisible = visibleNodes.includes(edge.to);
     if (!fromVisible || !toVisible) return;
 
     // Check if this edge is on the attack path
     const fromIdx = ATTACK_PATH.indexOf(edge.from);
-    const toIdx   = ATTACK_PATH.indexOf(edge.to);
+    const toIdx = ATTACK_PATH.indexOf(edge.to);
     const isAttackEdge = edge.attack && fromIdx !== -1 && toIdx !== -1 && fromIdx < toIdx;
     const edgeProgress = isAttackEdge
       ? Math.max(0, Math.min(1, attackProgressNodes - fromIdx))
@@ -187,8 +187,8 @@ function renderFrame(
   NODES.forEach((node) => {
     if (!visibleNodes.includes(node.id)) return;
 
-    const pos  = getPos(node);
-    const st   = kindStyle[node.kind];
+    const pos = getPos(node);
+    const st = kindStyle[node.kind];
     const isOnAttackPath = ATTACK_PATH.includes(node.id);
     const attackIdx = ATTACK_PATH.indexOf(node.id);
     const nodeActivated = attackActive && attackProgressNodes >= attackIdx;
@@ -256,7 +256,7 @@ function renderFrame(
 /* ─── component ─── */
 export default function ScrollGraph() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dims, setDims] = useState({ w: 800, h: 400 });
 
   const { scrollYProgress } = useScroll({
@@ -343,7 +343,7 @@ export default function ScrollGraph() {
               <div className="w-2.5 h-2.5 rounded-full bg-border-strong" />
               <div className="w-2.5 h-2.5 rounded-full bg-border-strong" />
               <span className="text-xs text-ink-tertiary ml-3 font-mono">
-                kubeview — graph view
+                VECTORNETES — graph view
               </span>
             </div>
 

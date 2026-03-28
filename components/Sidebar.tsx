@@ -16,12 +16,12 @@ const nav: Array<{
   icon: React.ComponentType<{ className?: string }>;
   label: string;
 }> = [
-  { view: "overview",        icon: LayoutDashboard, label: "Overview" },
-  { view: "paths",           icon: GitBranch,       label: "Attack Paths" },
-  { view: "vulnerabilities", icon: Bug,             label: "Vulnerabilities" },
-  { view: "critical",        icon: Target,          label: "Critical Node" },
-  { view: "report",          icon: FileText,        label: "Report" },
-];
+    { view: "overview", icon: LayoutDashboard, label: "Overview" },
+    { view: "paths", icon: GitBranch, label: "Attack Paths" },
+    { view: "vulnerabilities", icon: Bug, label: "Vulnerabilities" },
+    { view: "critical", icon: Target, label: "Critical Node" },
+    { view: "report", icon: FileText, label: "Report" },
+  ];
 
 export default function Sidebar() {
   const { activeView, setActiveView } = useAppStore();
@@ -34,7 +34,7 @@ export default function Sidebar() {
           <Shield className="w-3 h-3 text-white" />
         </div>
         <span className="text-sm font-semibold tracking-tight text-ink">
-          Kubeview
+          VECTORNETES
         </span>
       </div>
 
