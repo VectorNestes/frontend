@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(wmic logicaldisk:*)",
+      "Bash(npm cache:*)",
+      "Bash(npx next:*)",
+      "Bash(timeout 90 npx tsc --noEmit)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002/dashboard/graph)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002/dashboard/attack-paths)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3002/)",
+      "Bash(netstat -ano)",
+      "Bash(cmd //c \"taskkill /PID 4996 /F & taskkill /PID 25828 /F\")"
+    ]
+  }
+}

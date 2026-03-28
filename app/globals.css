@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variant-numeric: tabular-nums;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #0B0B0C;
+    color: #FAFAFA;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272A;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3F3F46;
+  }
+
+  ::selection {
+    background: rgba(124, 58, 237, 0.25);
+    color: #FAFAFA;
+  }
+}
+
+@layer components {
+  /* Surface cards */
+  .card {
+    @apply bg-surface border border-border rounded-xl;
+  }
+  .card-elevated {
+    @apply bg-elevated border border-border rounded-xl shadow-md;
+  }
+
+  /* Input base */
+  .input-base {
+    @apply w-full px-3 py-2.5 rounded-lg bg-canvas border border-border text-sm text-ink
+           placeholder:text-ink-tertiary
+           focus:outline-none focus:border-violet-border focus:shadow-ring-violet
+           transition-all duration-150;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
+           bg-violet text-white text-sm font-medium
+           hover:bg-violet-600 active:bg-violet-700
+           transition-colors duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
+           bg-elevated border border-border text-ink-secondary text-sm font-medium
+           hover:text-ink hover:border-border-strong
+           transition-colors duration-150;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-md
+           text-ink-secondary text-sm
+           hover:text-ink hover:bg-elevated
+           transition-colors duration-150;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
+           bg-danger-muted border border-danger-border text-danger-text text-sm font-medium
+           hover:bg-danger/20
+           transition-colors duration-150;
+  }
+
+  /* Badge variants */
+  .badge-critical {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-semibold uppercase tracking-wider
+           bg-danger-muted border border-danger-border text-danger-text;
+  }
+  .badge-high {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-semibold uppercase tracking-wider
+           bg-amber-muted border border-amber-border text-amber-text;
+  }
+  .badge-medium {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-semibold uppercase tracking-wider
+           bg-violet-muted border border-violet-border text-violet-text;
+  }
+  .badge-low {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-semibold uppercase tracking-wider
+           bg-elevated border border-border text-ink-secondary;
+  }
+
+  /* Sidebar nav item */
+  .nav-item {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-ink-secondary
+           hover:text-ink hover:bg-elevated
+           transition-colors duration-150 cursor-pointer;
+  }
+  .nav-item-active {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-ink bg-elevated
+           border border-border;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply text-2xs font-semibold uppercase tracking-widest text-ink-tertiary;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border;
+  }
+}
+
+@layer utilities {
+  /* Noise texture overlay */
+  .noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Subtle vignette */
+  .vignette::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Fade mask bottom */
+  .fade-bottom {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+  .fade-top {
+    mask-image: linear-gradient(to top, black 60%, transparent 100%);
+  }
+
+  /* Font settings */
+  .font-feature {
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+/* ─── React Flow overrides ─── */
+.react-flow__renderer {
+  background: transparent !important;
+}
+.react-flow__pane {
+  cursor: default !important;
+}
+.react-flow__background pattern circle {
+  fill: #27272A !important;
+}
+.react-flow__controls {
+  background: #18181B !important;
+  border: 1px solid #1C1C1F !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+  overflow: hidden;
+}
+.react-flow__controls-button {
+  background: transparent !important;
+  border-color: #1C1C1F !important;
+  color: #71717A !important;
+  fill: #71717A !important;
+  transition: color 0.15s, fill 0.15s !important;
+}
+.react-flow__controls-button:hover {
+  background: #1C1C1F !important;
+  color: #FAFAFA !important;
+  fill: #FAFAFA !important;
+}
+.react-flow__minimap {
+  background: #121214 !important;
+  border: 1px solid #1C1C1F !important;
+  border-radius: 8px !important;
+}
+.react-flow__minimap-mask {
+  fill: rgba(11,11,12,0.8) !important;
+}
+.react-flow__handle {
+  width: 6px !important;
+  height: 6px !important;
+  border: 1px solid #3F3F46 !important;
+  background: #27272A !important;
+  transition: background 0.15s, border-color 0.15s !important;
+}
+.react-flow__handle:hover {
+  background: #7C3AED !important;
+  border-color: #7C3AED !important;
+}
+.react-flow__edge-path {
+  stroke-width: 1.5 !important;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 2 !important;
+}
+.react-flow__node.selected .react-flow__node-default,
+.react-flow__node:focus .react-flow__node-default {
+  outline: none !important;
+}
+
+/* Attack path edge animation */
+@keyframes dashdraw {
+  from { stroke-dashoffset: 12; }
+  to   { stroke-dashoffset: 0; }
+}
+.edge-attack {
+  animation: dashdraw 0.4s linear infinite;
+  stroke-dasharray: 4 8;
+}
