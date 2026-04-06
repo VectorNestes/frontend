@@ -553,7 +553,7 @@ function AttackGraphSection() {
     ];
     const gEdges = [[0, 2], [1, 2], [2, 3], [4, 5], [5, 7], [3, 6], [6, 8], [0, 10], [10, 7], [9, 6], [1, 4], [4, 11], [11, 8]];
     const attackPath = [0, 2, 3, 6, 8];
-    let traceT = 0; let t = 0; let af;
+    let traceT = 0; let t = 0; let af: number;
 
     const draw = () => {
       t++;
@@ -564,8 +564,8 @@ function AttackGraphSection() {
       ctx.clearRect(0, 0, W, H);
       ctx.globalAlpha = 1;
 
-      const nx = (n) => n.x * W;
-      const ny = (n) => n.y * H;
+      const nx = (n: { x: number; y: number }) => n.x * W;
+      const ny = (n: { x: number; y: number }) => n.y * H;
 
       // Edges — always fully visible
       ctx.save(); ctx.strokeStyle = "rgba(0,245,255,0.5)"; ctx.lineWidth = 1.5;
