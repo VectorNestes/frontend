@@ -50,7 +50,7 @@ export default function DashboardPage() {
         setLoading("graph", false);
         setLoading("vulnerabilities", false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // View-specific data fetching
@@ -97,7 +97,7 @@ export default function DashboardPage() {
         )
         .finally(() => setLoading("report", false));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeView]);
 
   const showGraph = activeView !== "report";

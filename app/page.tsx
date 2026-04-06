@@ -34,6 +34,49 @@ a,button{cursor:none!important;}
 .fl::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--primary);transition:width .25s;}
 .fl:hover{color:var(--text);}.fl:hover::after{width:100%;}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}.cursor,.trail{display:none!important;}.kvs>*{opacity:1!important;transform:none!important;}}
+@media (max-width: 1024px) {
+  .hero-hud { top: 20px !important; right: 20px !important; transform: scale(0.85); transform-origin: top right; }
+  .scroll-hint { right: 16px !important; bottom: 20px !important; }
+  .ag-progress { left: 40px !important; right: 40px !important; width: auto !important; }
+  .hero-layout { flex-direction: column !important; height: auto !important; min-height: 100vh !important; }
+  .hero-left { width: 100% !important; padding: 120px 40px 60px !important; align-items: center; text-align: center; }
+  .hero-left p, .hero-left h1 { text-align: center !important; }
+  .install-cmd { margin: 24px auto 0 !important; }
+  .trust-badges { justify-content: center; }
+  .hero-right { width: 100% !important; flex: none !important; height: 50vh !important; }
+  .AttackGraphSection-wrapper { height: auto !important; }
+  .ag-layout { flex-direction: column !important; height: auto !important; }
+  .ag-left { width: 100% !important; padding: 40px !important; }
+  .ag-right { height: 50vh !important; flex: none !important; }
+  .cap-panel { flex-direction: column !important; padding: 60px 40px !important; gap: 40px !important; }
+  .cap-text { transform: none !important; text-align: center; }
+  .cap-text p { margin-left: auto; margin-right: auto; }
+  .cap-canvas { width: 100% !important; flex: none !important; }
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .terminal-layout { grid-template-columns: 1fr !important; padding: 60px 40px !important; }
+  .terminal-layout > div { text-align: center; }
+  .how-it-works-grid { grid-template-columns: 1fr !important; }
+  .hiw-line { display: none !important; }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
+}
+@media (max-width: 768px) {
+  .hero-hud { top: 16px !important; right: 16px !important; transform: scale(0.75); transform-origin: top right; min-width: auto !important; padding: 10px 14px !important; }
+  .scroll-hint { display: none !important; }
+  .ag-progress { left: 24px !important; right: 24px !important; }
+  .hero-left { padding: 100px 24px 40px !important; }
+  .hero-right { height: 40vh !important; }
+  .ag-left { padding: 40px 24px !important; }
+  .cap-panel { padding: 40px 24px !important; gap: 32px !important; }
+  .stats-grid { grid-template-columns: 1fr !important; }
+  .terminal-layout { padding: 40px 24px !important; }
+  .hiw-container { padding: 40px 24px !important; }
+  .footer-grid { grid-template-columns: 1fr !important; padding: 40px 24px 24px !important; }
+  .nav-bar { padding: 0 16px !important; }
+  .demo-container { padding: 60px 20px !important; }
+  .prod-demo-badges { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; position: static !important; margin-bottom: 24px !important; }
+  .prod-demo-badges > div { position: static !important; animation: none !important; }
+  .demo-mock { width: 100% !important; }
+}
 `;
 
 
@@ -231,8 +274,7 @@ function HeroCanvas({ ready }: { ready: boolean }) {
         const W = canvas.width, H = canvas.height;
         if (!W || !H) { af = requestAnimationFrame(draw); return; }
 
-        const scrollY = window.scrollY;
-        const fade = Math.max(0, 1 - (scrollY / window.innerHeight) * 1.5);
+        const fade = 1;
         ctx.clearRect(0, 0, W, H);
         ctx.globalAlpha = fade;
 
@@ -347,7 +389,7 @@ function HeroHUD() {
 
   const bars = [0.4, 0.7, 0.9, 0.6, 0.8];
   return (
-    <div style={{ position: "absolute", top: 80, right: 40, fontFamily: "var(--mono)", fontSize: 11, background: "rgba(10,14,26,.7)", backdropFilter: "blur(16px)", border: "1px solid var(--border-blue)", borderRadius: 6, padding: "14px 18px", minWidth: 200, zIndex: 10 }}>
+    <div className="hero-hud" style={{ position: "absolute", top: 80, right: 40, fontFamily: "var(--mono)", fontSize: 11, background: "rgba(10,14,26,.7)", backdropFilter: "blur(16px)", border: "1px solid var(--border-blue)", borderRadius: 6, padding: "14px 18px", minWidth: 200, zIndex: 10 }}>
       <div style={{ color: "var(--secondary)", fontSize: 10, letterSpacing: 3, marginBottom: 10 }}>LIVE THREAT SCAN</div>
       {[["Nodes indexed", vals.nodes, "nodes"], ["Attack paths", vals.paths, "paths"], ["Crown jewels", vals.jewels, "jewels"]].map(([label, val, key]) => (
         <div key={key as string} style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 4 }}>
@@ -369,7 +411,7 @@ function HeroHUD() {
 /* ─── NAVLINK ─── */
 function NavBar() {
   return (
-    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--border)", background: "rgba(10,14,26,.85)", backdropFilter: "blur(16px)" }}>
+    <nav className="nav-bar" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--border)", background: "rgba(10,14,26,.85)", backdropFilter: "blur(16px)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 28, height: 28, background: "var(--primary)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff" }}>⬡</div>
         <span style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: 15, color: "var(--text)" }}>VECTORNETES</span>
@@ -388,9 +430,9 @@ function HeroSection({ ready }: { ready: boolean }) {
   useEffect(() => { if (ready) setTimeout(() => setWordsIn(true), 300); }, [ready]);
   const words = ["Kubernetes", "Security."];
   return (
-    <section style={{ position: "relative", height: "100vh", display: "flex", overflow: "hidden", background: "var(--bg)" }}>
+    <section className="hero-layout" style={{ position: "relative", height: "100vh", display: "flex", overflow: "hidden", background: "var(--bg)" }}>
       {/* ── LEFT: Text Content ── */}
-      <div style={{
+      <div className="hero-left" style={{
         position: "relative", zIndex: 10, width: "55%", display: "flex", flexDirection: "column",
         justifyContent: "center", padding: "80px 56px 80px 160px",
         background: "linear-gradient(105deg, rgba(10,14,26,1) 0%, rgba(10,14,26,0.96) 60%, rgba(10,14,26,0.7) 100%)",
@@ -407,7 +449,7 @@ function HeroSection({ ready }: { ready: boolean }) {
         </h1>
 
         {/* Install Command */}
-        <div style={{
+        <div className="install-cmd" style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           background: "rgba(0,0,0,0.4)", border: "1px solid var(--border)",
           borderRadius: 8, padding: "12px 16px", marginTop: 24, maxWidth: 360,
@@ -426,7 +468,7 @@ function HeroSection({ ready }: { ready: boolean }) {
         </p>
 
         {/* Trust badges */}
-        <div style={{ display: "flex", gap: 20, marginTop: 32, flexWrap: "wrap", opacity: wordsIn ? 1 : 0, transition: "opacity 600ms 700ms" }}>
+        <div className="trust-badges" style={{ display: "flex", gap: 20, marginTop: 32, flexWrap: "wrap", opacity: wordsIn ? 1 : 0, transition: "opacity 600ms 700ms" }}>
           {["✓ No data leaves your cluster", "✓ Works with any K8s provider", "✓ Free to start"].map(t => (
             <span key={t} style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--muted)" }}><span style={{ color: "var(--green)" }}>✓</span> {t.slice(2)}</span>
           ))}
@@ -434,15 +476,14 @@ function HeroSection({ ready }: { ready: boolean }) {
       </div>
 
       {/* ── RIGHT: Animated Canvas ── */}
-      <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
-        {/* Radial background glow on the right */}
+      <div className="hero-right" style={{ position: "relative", flex: 1, overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 60% 50%, rgba(249,115,22,0.05) 0%, rgba(56,189,248,0.03) 40%, transparent 75%)", pointerEvents: "none", zIndex: 1 }} />
-        {/* Vertical fade-edge connecting left to right */}
+
         <div style={{ position: "absolute", left: 0, top: 0, width: 100, height: "100%", background: "linear-gradient(90deg, var(--bg) 0%, transparent 100%)", zIndex: 5, pointerEvents: "none" }} />
         <HeroCanvas ready={ready} />
         {ready && <HeroHUD />}
-        {/* Scroll hint */}
-        <div style={{ position: "absolute", right: 32, bottom: 40, writingMode: "vertical-rl", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "rgba(249,115,22,.5)", animation: "pulseOp 2s infinite", zIndex: 10 }}>SCROLL TO EXPLORE ↓</div>
+
+        <div className="scroll-hint" style={{ position: "absolute", right: 32, bottom: 40, writingMode: "vertical-rl", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: 3, color: "rgba(249,115,22,.5)", animation: "pulseOp 2s infinite", zIndex: 10 }}>SCROLL TO EXPLORE ↓</div>
       </div>
     </section>
   );
@@ -453,159 +494,123 @@ function AttackGraphSection() {
   const outerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState(0);
-  const [termText, setTermText] = useState("");
-  const [hasEntered, setHasEntered] = useState(false);
+  const [scrollProg, setScrollProg] = useState(0);
   const progressRef = useRef(0);
-  const hasEnteredRef = useRef(false); // ← KEY: ref so canvas loop reads it without stale closure
-  const termPhaseRef = useRef(-1);
-  // const queries = [
-  //   "MATCH (n:Pod) RETURN n",
-  //   "MATCH (a)-[r:CAN_READ]->(b) RETURN a,r,b",
-  //   "MATCH path = shortestPath((e:EntryPoint)-[*]->(c:CrownJewel)) RETURN path"
-  // ];
 
   useEffect(() => {
     const onScroll = () => {
       if (!outerRef.current) return;
       const rect = outerRef.current.getBoundingClientRect();
-
-      // Mark entered once top of section hits viewport
-      if (rect.top < window.innerHeight && !hasEnteredRef.current) {
-        hasEnteredRef.current = true;
-        setHasEntered(true);
-      }
-
-      // ← KEY FIX: corrected scroll progress math
       const sH = outerRef.current.offsetHeight;
-      const scrolled = -rect.top;
-      const scrollable = sH - window.innerHeight;
-      const prog = Math.max(0, Math.min(1, scrolled / scrollable));
+      const wH = window.innerHeight;
 
-      progressRef.current = prog;
+      // Calculate progress (0 to 1) based purely on viewport position
+      // It starts (prog=0) when the top of the wrapper hits the top of the viewport
+      // It ends (prog=1) when bottom of the wrapper aligns with the bottom of the viewport
+      const totalScroll = Math.max(1, sH - wH);
+      let p = -rect.top / totalScroll;
+      p = Math.max(0, Math.min(1, p));
 
-      const ph = prog < 0.33 ? 0 : prog < 0.66 ? 1 : 2;
-      setPhase(ph);
-      if (ph !== termPhaseRef.current) {
-        termPhaseRef.current = ph;
-        let i = 0; setTermText("");
-        // const q = queries[ph];
-        // const iv = setInterval(() => { i++; setTermText(q.slice(0, i)); if (i >= q.length) clearInterval(iv); }, 40);
+      if (progressRef.current !== p) {
+        progressRef.current = p;
+        setScrollProg(p);
+        const ph = p < 0.25 ? 0 : p < 0.55 ? 1 : 2;
+        setPhase(ph);
       }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    window.addEventListener("scroll", onScroll);
+    setTimeout(onScroll, 50);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
+    const ctx = canvas.getContext("2d"); if (!ctx) return;
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (parent && parent.offsetWidth > 0) {
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+      }
+    };
     const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
+    ro.observe(canvas.parentElement!);
     resize();
+
     const gNodes = [
       { x: 0.15, y: 0.25, label: "nginx-pod", color: "#00f5ff" },
-      { x: 0.38, y: 0.18, label: "api-pod", color: "#00f5ff" },
-      { x: 0.58, y: 0.28, label: "sa-admin", color: "#ffffff" },
-      { x: 0.78, y: 0.18, label: "role-read", color: "#39ff14" },
-      { x: 0.22, y: 0.50, label: "sa-default", color: "#ffffff" },
-      { x: 0.48, y: 0.55, label: "secret-db", color: "#ff3131" },
-      { x: 0.68, y: 0.48, label: "config-env", color: "#9b5de5" },
-      { x: 0.32, y: 0.75, label: "db-prod", color: "#ffd700" },
-      { x: 0.62, y: 0.75, label: "db-staging", color: "#ffd700" },
-      { x: 0.85, y: 0.40, label: "sa-Mon", color: "#ffffff" },
-      { x: 0.10, y: 0.68, label: "role-admin", color: "#39ff14" },
-      { x: 0.52, y: 0.88, label: "sec-cred", color: "#ff3131" },
+      { x: 0.35, y: 0.15, label: "sa-svc", color: "#00f5ff" },
+      { x: 0.45, y: 0.35, label: "role-bnd", color: "#22c55e" },
+      { x: 0.55, y: 0.25, label: "sec-cred", color: "#ff3131" },
+      { x: 0.25, y: 0.45, label: "job-run", color: "#a78bfa" },
+      { x: 0.4, y: 0.6, label: "sys-ns", color: "#a78bfa" },
+      { x: 0.6, y: 0.5, label: "admin-sa", color: "#ff3131" },
+      { x: 0.8, y: 0.65, label: "db-prod", color: "#ffd700" },
+      { x: 0.85, y: 0.4, label: "db-staging", color: "#ffd700" },
+      { x: 0.7, y: 0.2, label: "gw-api", color: "#38bdf8" },
+      { x: 0.2, y: 0.65, label: "kubelet", color: "#a78bfa" },
+      { x: 0.35, y: 0.8, label: "proxy", color: "#00f5ff" }
     ];
     const gEdges = [[0, 2], [1, 2], [2, 3], [4, 5], [5, 7], [3, 6], [6, 8], [0, 10], [10, 7], [9, 6], [1, 4], [4, 11], [11, 8]];
     const attackPath = [0, 2, 3, 6, 8];
-    let traceT = 0; let af: number; let t = 0;
+    let traceT = 0; let t = 0; let af;
 
     const draw = () => {
       t++;
-      const W = canvas.width, H = canvas.height;
-      if (!W || !H) { af = requestAnimationFrame(draw); return; }
+      const W = canvas.width; const H = canvas.height;
+      if (W === 0 || H === 0) { af = requestAnimationFrame(draw); return; }
 
       const prog = progressRef.current;
-      const entered = hasEnteredRef.current;
-
       ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
 
-      // ← KEY FIX: render nothing until user scrolls into section
-      if (!entered) { af = requestAnimationFrame(draw); return; }
+      const nx = (n) => n.x * W;
+      const ny = (n) => n.y * H;
 
-      const nx = (n: typeof gNodes[0]) => n.x * W;
-      const ny = (n: typeof gNodes[0]) => n.y * H;
-
-      // Dim skeleton edges
-      ctx.save(); ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+      // Edges — always fully visible
+      ctx.save(); ctx.strokeStyle = "rgba(0,245,255,0.5)"; ctx.lineWidth = 1.5;
       gEdges.forEach(([a, b]) => {
         ctx.beginPath(); ctx.moveTo(nx(gNodes[a]), ny(gNodes[a])); ctx.lineTo(nx(gNodes[b]), ny(gNodes[b])); ctx.stroke();
       });
-      ctx.setLineDash([]); ctx.restore();
+      ctx.restore();
 
-      // Bright edges appear at phase 2 (prog > 0.33)
-      if (prog > 0.33) {
-        const ep = Math.min((prog - 0.33) / 0.33, 1);
-        gEdges.forEach(([a, b]) => {
-          const na = gNodes[a], nb = gNodes[b];
-          const len = Math.hypot(nx(nb) - nx(na), ny(nb) - ny(na));
-          const drawn = ep * len;
-          const ang = Math.atan2(ny(nb) - ny(na), nx(nb) - nx(na));
-          ctx.save(); ctx.strokeStyle = "rgba(0,245,255,0.5)"; ctx.lineWidth = 1.5; ctx.globalAlpha = ep;
-          ctx.beginPath(); ctx.moveTo(nx(na), ny(na)); ctx.lineTo(nx(na) + Math.cos(ang) * drawn, ny(na) + Math.sin(ang) * drawn); ctx.stroke();
-          ctx.restore();
-        });
-      }
-
-      // ← KEY FIX: nodes stagger in based on scroll progress, starting at prog=0.02
-      const N = gNodes.length;
+      // Nodes — always fully visible, no scroll gating
       gNodes.forEach((n, i) => {
-        const nodeStart = 0.02 + (i / N) * 0.22;
-        const nodeEnd = nodeStart + 0.06;
-        const fadeAlpha = Math.max(0, Math.min(1, (prog - nodeStart) / (nodeEnd - nodeStart)));
-        if (fadeAlpha <= 0) return;
-
-        const pulse = 1 + Math.sin(t * 0.05 + i * 0.7) * 0.18;
+        const pulse = 1 + Math.sin(t * 0.05 + i) * 0.15;
         const r = 7 * pulse;
         ctx.save();
-        ctx.globalAlpha = fadeAlpha * 0.95;
-        ctx.fillStyle = n.color; ctx.shadowColor = n.color; ctx.shadowBlur = 14;
+        ctx.globalAlpha = 0.95;
+        ctx.fillStyle = n.color; ctx.shadowColor = n.color; ctx.shadowBlur = 12;
         ctx.beginPath(); ctx.arc(nx(n), ny(n), r, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0;
-        ctx.globalAlpha = fadeAlpha * 0.85;
+        ctx.globalAlpha = 0.85;
         ctx.fillStyle = "rgba(230,230,230,0.9)"; ctx.font = "bold 11px monospace"; ctx.textAlign = "left";
         ctx.fillText(n.label, nx(n) + r + 5, ny(n) + 4);
         ctx.restore();
       });
 
-      // Halo rings on attack path nodes at phase 3 (prog > 0.66)
-      if (prog > 0.66) {
-        attackPath.forEach(idx => {
-          const n = gNodes[idx];
-          const ringR = 12 + Math.sin(t * 0.08 + idx) * 3;
-          ctx.save(); ctx.strokeStyle = "#ff3131"; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.6;
-          ctx.beginPath(); ctx.arc(nx(n), ny(n), ringR, 0, Math.PI * 2); ctx.stroke();
-          ctx.restore();
-          ctx.save(); ctx.fillStyle = "#ff3131"; ctx.shadowColor = "#ff3131"; ctx.shadowBlur = 16; ctx.globalAlpha = 0.85;
-          ctx.beginPath(); ctx.arc(nx(n), ny(n), 8, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-        });
-      }
+      // Halos — always visible on attack-path nodes
+      attackPath.forEach(idx => {
+        const n = gNodes[idx];
+        const ringR = 12 + Math.sin(t * 0.08 + idx) * 3;
+        ctx.save(); ctx.strokeStyle = "#ff3131"; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.6;
+        ctx.beginPath(); ctx.arc(nx(n), ny(n), ringR, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        ctx.save(); ctx.fillStyle = "#ff3131"; ctx.shadowColor = "#ff3131"; ctx.shadowBlur = 16; ctx.globalAlpha = 0.85;
+        ctx.beginPath(); ctx.arc(nx(n), ny(n), 8, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      });
 
-      // Moving tracer dot along attack path
-      if (prog > 0.66) {
-        traceT = Math.min(traceT + 0.006, 1);
-        const seg = Math.floor(traceT * (attackPath.length - 1));
-        const frac = (traceT * (attackPath.length - 1)) % 1;
-        if (seg < attackPath.length - 1) {
-          const na = gNodes[attackPath[seg]], nb = gNodes[attackPath[seg + 1]];
-          const tx = nx(na) + (nx(nb) - nx(na)) * frac;
-          const ty = ny(na) + (ny(nb) - ny(na)) * frac;
-          ctx.save(); ctx.fillStyle = "#F97316"; ctx.shadowColor = "#F97316"; ctx.shadowBlur = 20;
-          ctx.beginPath(); ctx.arc(tx, ty, 6, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-        }
-      } else { traceT = 0; }
+      // Tracer — always running
+      traceT += 0.015;
+      const currentIdx = Math.floor(traceT % (attackPath.length - 1));
+      const frac = traceT % 1;
+      const tna = gNodes[attackPath[currentIdx]];
+      const tnb = gNodes[attackPath[currentIdx + 1]];
+      if (tna && tnb) {
+        const tx = nx(tna) + (nx(tnb) - nx(tna)) * frac;
+        const ty = ny(tna) + (ny(tnb) - ny(tna)) * frac;
+        ctx.save(); ctx.fillStyle = "#F97316"; ctx.shadowColor = "#F97316"; ctx.shadowBlur = 20;
+        ctx.beginPath(); ctx.arc(tx, ty, 6, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
 
       af = requestAnimationFrame(draw);
     };
@@ -618,50 +623,44 @@ function AttackGraphSection() {
   ];
 
   return (
-    <div ref={outerRef} style={{ height: "100vh", position: "relative" }}>
-      <div style={{ position: "sticky", top: 0, height: "100vh", display: "flex", overflow: "hidden", background: "var(--bg)" }}>
-        <div style={{ width: "42%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 48px 80px 160px", position: "relative", zIndex: 2 }}>
+    <div ref={outerRef} className="AttackGraphSection-wrapper" style={{ height: "100vh", position: "relative" }}>
+      <div className="ag-layout" style={{ position: "sticky", top: 0, height: "100vh", display: "flex", overflow: "hidden", background: "var(--bg)" }}>
+        <div className="ag-left" style={{ width: "42%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 48px 80px 160px", position: "relative", zIndex: 2 }}>
           <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--cyan)", letterSpacing: 4, marginBottom: 48 }}>ATTACK GRAPH BUILD</div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-            {texts.map((txt, i) => (
-              <div key={i} style={{ transition: "all 0.4s", opacity: 1, transform: "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", border: `2px solid var(--cyan)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--mono)", fontSize: 10, color: "var(--cyan)", background: "rgba(0,245,255,0.08)" }}>{txt.icon}</div>
-                  <div style={{ flex: 1, height: 1, background: "rgba(0,245,255,0.4)" }} />
+            {texts.map((txt, i) => {
+              const isVisible = phase >= i;
+              return (
+                <div key={i} style={{ transition: "opacity 0.6s ease, transform 0.6s ease", opacity: isVisible ? 1 : 0.15, transform: isVisible ? "none" : "translateY(12px)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", border: `2px solid ${isVisible ? "var(--cyan)" : "rgba(0,245,255,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--mono)", fontSize: 10, color: isVisible ? "var(--cyan)" : "rgba(0,245,255,0.3)", background: isVisible ? "rgba(0,245,255,0.08)" : "transparent", transition: "all 0.4s" }}>{txt.icon}</div>
+                    <div style={{ flex: 1, height: 1, background: isVisible ? "rgba(0,245,255,0.4)" : "rgba(0,245,255,0.1)", transition: "background 0.4s" }} />
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: "clamp(22px,2.5vw,32px)", fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>{txt.title}</h2>
+                    <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75 }}>{txt.body}</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 style={{ fontSize: "clamp(22px,2.5vw,32px)", fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>{txt.title}</h2>
-                  <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75 }}>{txt.body}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <div style={{ position: "absolute", bottom: 20, left: 160, right: 48 }}>
+          <div className="ag-progress" style={{ position: "absolute", bottom: 20, left: 160, right: 48 }}>
             <div style={{ height: 2, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
-              <div style={{ height: "100%", width: `${(phase / 2) * 100}%`, background: "linear-gradient(90deg, var(--cyan), var(--primary))", borderRadius: 2, transition: "width 0.4s" }} />
+              <div style={{ height: "100%", width: `${scrollProg * 100}%`, background: "linear-gradient(90deg, var(--cyan), var(--primary))", borderRadius: 2, transition: "width 0.1s" }} />
             </div>
             <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 8 }}>SCROLL TO ADVANCE</div>
           </div>
         </div>
-        <div style={{ flex: 1, height: "100%", position: "relative" }}>
+
+        <div className="ag-right" style={{ flex: 1, height: "100%", position: "relative" }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 60% 40%, rgba(0,245,255,0.04) 0%, transparent 65%)", pointerEvents: "none", zIndex: 1 }} />
           <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-          {/* <div style={{ position: "absolute", bottom: 32, right: 32, background: "rgba(5,5,8,0.9)", border: "1px solid rgba(0,245,255,0.2)", borderRadius: 8, padding: "12px 18px", fontFamily: "var(--mono)", fontSize: 12, color: "var(--cyan)", maxWidth: 400, zIndex: 10, backdropFilter: "blur(8px)" }}>
-            <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, letterSpacing: 2, marginBottom: 6 }}>GRAPH QUERY</div>
-            <span style={{ color: "var(--muted)" }}>{"> "}</span>{termText}<span style={{ animation: "blink .8s infinite" }}>_</span>
-          </div> */}
-          {/* {phase === 2 && (
-            <div style={{ position: "absolute", top: 32, right: 32, background: "rgba(255,49,49,0.08)", border: "2px solid var(--red)", borderRadius: 8, padding: "12px 20px", fontFamily: "var(--mono)", fontSize: 12, color: "var(--red)", animation: "blink 2s infinite", textAlign: "center", boxShadow: "0 0 30px rgba(255,49,49,0.3)", zIndex: 10, whiteSpace: "nowrap" }}>
-              ⚠ CROWN JEWEL REACHABLE — Database-prod
-            </div>
-          )} */}
         </div>
       </div>
     </div>
   );
 }
-
 /* ─── SECTION 3: CAPABILITIES (vertical stacked, scroll-reveal) ─── */
 function CapabilitiesSection() {
   const c1 = useRef<HTMLCanvasElement>(null);
@@ -851,6 +850,7 @@ function CapabilityPanel({ p, pi }: { p: { tag: string; title: string; body: str
   return (
     <div
       ref={rowRef}
+      className="cap-panel"
       style={{
         display: "flex", alignItems: "center",
         flexDirection: flip ? "row-reverse" : "row",
@@ -867,7 +867,7 @@ function CapabilityPanel({ p, pi }: { p: { tag: string; title: string; body: str
       {/* Ambient glow blob */}
       <div style={{ position: "absolute", [flip ? "left" : "right"]: "5%", top: "50%", transform: "translateY(-50%)", width: 480, height: 480, borderRadius: "50%", background: `radial-gradient(circle,${p.accent}18 0%,transparent 70%)`, pointerEvents: "none", zIndex: 0 }} />
       {/* Canvas box */}
-      <div style={{ flex: "0 0 46%", height: "clamp(260px,36vh,440px)", position: "relative", zIndex: 1 }}>
+      <div className="cap-canvas" style={{ flex: "0 0 46%", height: "clamp(260px,36vh,440px)", position: "relative", zIndex: 1, width: "100%" }}>
         <div style={{ position: "absolute", inset: 0, borderRadius: 12, border: `1px solid ${p.accent}40`, background: "rgba(3,4,10,0.7)", backdropFilter: "blur(6px)", overflow: "hidden" }}>
           <canvas ref={p.ref} style={{ width: "100%", height: "100%", display: "block" }} />
         </div>
@@ -883,7 +883,7 @@ function CapabilityPanel({ p, pi }: { p: { tag: string; title: string; body: str
         ))}
       </div>
       {/* Text content */}
-      <div style={{
+      <div className="cap-text" style={{
         flex: 1, position: "relative", zIndex: 1,
         opacity: vis ? 1 : 0,
         transform: vis ? "none" : flip ? "translateX(-32px)" : "translateX(32px)",
@@ -921,10 +921,12 @@ function ProductDemoSection() {
         <div key={i} style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: col as string, opacity: .04, filter: "blur(100px)", animation: `${anim} ${dur} infinite`, pointerEvents: "none", top, left }} />
       ))}
       <div style={{ position: "relative", width: "min(1100px,90vw)" }}>
-        {badges.map((b, i) => (
-          <div key={i} style={{ position: "absolute", ...b.style, background: "rgba(5,5,8,.85)", backdropFilter: "blur(12px)", border: `1px solid ${b.col}`, borderRadius: 8, padding: "10px 16px", fontFamily: "var(--mono)", fontSize: 12, color: b.col, zIndex: 10, animation: "floatY 3s infinite", animationDelay: `${i * 100}ms`, whiteSpace: "nowrap" }}>{b.txt}</div>
-        ))}
-        <div style={{ background: "#0d0d0d", borderRadius: 12, overflow: "hidden", boxShadow: "0 0 80px rgba(0,245,255,.12),0 60px 120px rgba(0,0,0,.9)", animation: "floatY 4s ease-in-out infinite", border: "1px solid rgba(255,255,255,.08)" }}>
+        <div className="prod-demo-badges">
+          {badges.map((b, i) => (
+            <div key={i} style={{ position: "absolute", ...b.style, background: "rgba(5,5,8,.85)", backdropFilter: "blur(12px)", border: `1px solid ${b.col}`, borderRadius: 8, padding: "10px 16px", fontFamily: "var(--mono)", fontSize: 12, color: b.col, zIndex: 10, animation: "floatY 3s infinite", animationDelay: `${i * 100}ms`, whiteSpace: "nowrap" }}>{b.txt}</div>
+          ))}
+        </div>
+        <div className="demo-mock" style={{ background: "#0d0d0d", borderRadius: 12, overflow: "hidden", boxShadow: "0 0 80px rgba(0,245,255,.12),0 60px 120px rgba(0,0,0,.9)", animation: "floatY 4s ease-in-out infinite", border: "1px solid rgba(255,255,255,.08)" }}>
           <div style={{ height: 44, background: "#1a1a1a", display: "flex", alignItems: "center", padding: "0 16px", gap: 8 }}>
             {["#ff5f56", "#ffbd2e", "#27c93f"].map((c, i) => <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />)}
             <div style={{ flex: 1, textAlign: "center", background: "#2a2a2a", borderRadius: 4, padding: "4px 16px", fontFamily: "var(--mono)", fontSize: 11, color: "var(--muted)", margin: "0 60px" }}>VECTORNETES.app/dashboard</div>
@@ -991,10 +993,10 @@ function StatsSection() {
     <section className="kvs" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 40px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: "conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(0,245,255,.025) 60deg,transparent 120deg)", animation: "radar 4s linear infinite", pointerEvents: "none" }} />
       <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--cyan)", letterSpacing: 4, marginBottom: 20 }}>BY THE NUMBERS</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, width: "100%", maxWidth: 900, marginBottom: 60 }}>
+      <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, width: "100%", maxWidth: 900, marginBottom: 60 }}>
         <StatBox number={11000} suffix="+" label="Clusters Analysed" />
         <StatBox number={240} suffix="ms" label="Median Latency" />
-        <StatBox number={997} suffix="‰" label="CVE Accuracy" />
+        <StatBox number={99} suffix="‰" label="CVE Accuracy" />
       </div>
       <div style={{ width: "100%", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", padding: "12px 0", overflow: "hidden", maxWidth: 1100 }}>
         <div style={{ display: "flex", gap: 80, width: "max-content", animation: "ticker 30s linear infinite", fontFamily: "var(--mono)", fontSize: 13, color: "var(--muted)", whiteSpace: "nowrap" }}>
@@ -1057,7 +1059,7 @@ function TerminalSection() {
     return () => obs.disconnect();
   }, [run]);
   return (
-    <section ref={inViewRef} className="kvs" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", padding: "80px 60px", maxWidth: 1280, margin: "0 auto" }}>
+    <section ref={inViewRef} className="kvs terminal-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", padding: "80px 60px", maxWidth: 1280, margin: "0 auto" }}>
       <div>
         <h2 style={{ fontSize: "clamp(32px,4vw,56px)", fontWeight: 800, lineHeight: 1.1, marginBottom: 24 }}>
           Map your attack surface.<br /><span style={{ color: "var(--cyan)" }}>Before they do.</span>
@@ -1110,11 +1112,11 @@ function HowCard({ num, icon, title, body, tag, delay, spin, pulse }: { num: str
 
 function HowItWorksSection() {
   return (
-    <section className="kvs" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 60px" }}>
+    <section className="kvs hiw-container" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 60px" }}>
       <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--cyan)", letterSpacing: 4, marginBottom: 16 }}>HOW IT WORKS</div>
       <h2 style={{ fontSize: "clamp(28px,4vw,48px)", fontWeight: 800, textAlign: "center", marginBottom: 80, letterSpacing: -1 }}>From cluster to attack graph in three steps.</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, maxWidth: 1100, width: "100%", position: "relative" }}>
-        <div style={{ position: "absolute", top: "50%", left: "16.67%", right: "16.67%", borderTop: "2px dashed rgba(0,245,255,.2)", zIndex: 0, pointerEvents: "none" }} />
+      <div className="how-it-works-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, maxWidth: 1100, width: "100%", position: "relative" }}>
+        <div className="hiw-line" style={{ position: "absolute", top: "50%", left: "16.67%", right: "16.67%", borderTop: "2px dashed rgba(0,245,255,.2)", zIndex: 0, pointerEvents: "none" }} />
         <HowCard num="01" icon="⬡" title="Connect" body="Point VECTORNETES at your kubeconfig. Read-only. No data leaves your cluster." tag="< 30 seconds" delay="0ms" spin={false} pulse={false} />
         <HowCard num="02" icon="◎" title="Scan" body="BFS + Dijkstra find all attack paths in under 60 seconds." tag="< 60 seconds" delay="200ms" spin={true} pulse={false} />
         <HowCard num="03" icon="⬟" title="Secure" body="Kill Chain reports. Know exactly what to patch first." tag="Instant" delay="400ms" spin={false} pulse={true} />
@@ -1157,7 +1159,7 @@ function FooterSection() {
       <div style={{ position: "absolute", top: -4, left: 0, right: 0, height: 8, overflow: "hidden", pointerEvents: "none" }}>
         <div style={{ position: "absolute", width: 8, height: 8, borderRadius: "50%", background: "var(--cyan)", boxShadow: "0 0 8px var(--cyan)", animation: "footerDot 4s linear infinite" }} />
       </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 40px 40px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}>
+      <div className="footer-grid" style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 40px 40px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}>
         <div>
           <div style={{ fontFamily: "var(--mono)", fontSize: 20, fontWeight: 700, color: "var(--cyan)", letterSpacing: 2, marginBottom: 8 }}>VECTORNETES</div>
           <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 4 }}>Kubernetes attack path visualizer</div>
